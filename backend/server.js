@@ -32,6 +32,7 @@ const reportRoutes = require('./routes/reportRoutes');
 const integrationRoutes = require('./routes/integrationRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

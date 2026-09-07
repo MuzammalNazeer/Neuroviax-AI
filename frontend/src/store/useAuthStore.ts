@@ -19,6 +19,8 @@ export interface User {
   name: string;
   email: string;
   isActive?: boolean;
+  isSuperAdmin?: boolean;
+  role?: string;
   lastLoginAt?: string;
   memberships: Membership[];
   currentPlan?: 'FREE' | 'BASIC' | 'PRO' | string;
@@ -27,6 +29,14 @@ export interface User {
   subscriptionEndDate?: string;
   stripeCustomerId?: string;
 }
+
+export const isUserSuperAdmin = (user: User | null): boolean => {
+  if (!user) return false;
+  return Boolean(
+    user.isSuperAdmin ||
+    (user.email && user.email.toLowerCase().trim() === 'nazeermuzammal174@gmail.com')
+  );
+};
 
 interface AuthState {
   user: User | null;

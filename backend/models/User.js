@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
     mfaEnabled: { type: Boolean, default: false },
+    isSuperAdmin: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     lastLoginAt: Date,
     // Password reset via OTP

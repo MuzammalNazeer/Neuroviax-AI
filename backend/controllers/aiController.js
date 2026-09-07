@@ -5,7 +5,9 @@ const Customer = require('../models/Customer');
 const Payment = require('../models/Payment');
 const AIRecommendation = require('../models/AIRecommendation');
 const Order = require('../models/Order');
+const Product = require('../models/Product');
 const { logAction } = require('../utils/audit');
+const { forecastProductDemand } = require('../utils/forecastingEngine');
 
 /**
  * Section 6.3, 6.6, 7 & 15: AI Recommendation Engine
@@ -33,30 +35,25 @@ const generateRecommendations = asyncHandler(async (req, res) => {
   const targetAssistant = req.body?.assistant || req.query?.assistant || 'all';
   const created = [];
 
-  // 1. Procurement & Inventory Assistant (FR-04, FR-05)
+  // 1. Procurement & Inventory Assistant (Powered by XGBoost / LightGBM Demand Forecasting)
   if (['all', 'procurement', 'inventory'].includes(targetAssistant)) {
     const inventoryItems = await Inventory.find({ business: req.businessId })
-      .populate('product', 'name sku reorderThreshold costPrice')
+      .populate('product', 'name sku reorderThreshold costPrice sellPrice category unit')
       .populate('branch', 'name');
+
+    const salesOrders = await Order.find({ business: req.businessId, type: 'sales' });
+    const suppliers = await Supplier.find({ business: req.businessId });
 
     for (const item of inventoryItems) {
       if (!item.product) continue;
 
-      const dailyVelocity = estimateDailyVelocity(item.movementHistory);
-      const daysOfCoverage = dailyVelocity > 0 ? item.quantity / dailyVelocity : Infinity;
-
-      // Forecast-adjusted alert (FR-04): trigger if under threshold OR under 7 days of coverage
-      const shouldFlag = item.quantity <= (item.product.reorderThreshold || 10) || daysOfCoverage < 7;
-      if (!shouldFlag) continue;
-
-      const suggestedQty = Math.max((item.product.reorderThreshold || 10) * 2 - item.quantity, Math.ceil(dailyVelocity * 14) || 20);
-      const estimatedCost = suggestedQty * (item.product.costPrice || 0);
-
-      // Find best supplier by latest price for this product, if price history exists
-      const suppliers = await Supplier.find({ business: req.businessId, 'priceHistory.product': item.product._id });
+      // Find best supplier
+      const matchingSuppliers = suppliers.filter((s) =>
+        (s.priceHistory || []).some((p) => p.product?.toString() === item.product._id.toString())
+      );
       let bestSupplier = null;
-      if (suppliers.length) {
-        bestSupplier = suppliers
+      if (matchingSuppliers.length) {
+        bestSupplier = matchingSuppliers
           .map((s) => {
             const hist = (s.priceHistory || []).filter((p) => p.product?.toString() === item.product._id.toString());
             const latest = hist.length ? hist[hist.length - 1].price : Infinity;
@@ -65,12 +62,32 @@ const generateRecommendations = asyncHandler(async (req, res) => {
           .sort((a, b) => a.latestPrice - b.latestPrice)[0];
       }
 
-      const confidenceScore = dailyVelocity > 0 ? Math.min(0.95, 0.5 + (item.movementHistory?.length || 0) * 0.03) : 0.65;
-      const riskTier = estimatedCost > RISK_THRESHOLD_HIGH_VALUE ? 'high' : 'medium';
+      // Execute ML Demand Forecast Engine
+      const forecast = forecastProductDemand({
+        product: item.product,
+        inventoryItem: item,
+        orders: salesOrders,
+        supplier: bestSupplier?.supplier || null,
+      });
 
-      const rationale = dailyVelocity > 0
-        ? `Current stock (${item.quantity}) covers ~${daysOfCoverage.toFixed(1)} days at recent demand of ${dailyVelocity.toFixed(2)}/day. Reorder threshold is ${item.product.reorderThreshold}.`
-        : `Current stock (${item.quantity}) is at or below the configured reorder threshold (${item.product.reorderThreshold || 10}); immediate restock recommended to prevent stockouts.`;
+      // Flag if riskTier is critical/high or quantity under reorder point
+      const shouldFlag =
+        ['critical', 'high'].includes(forecast.metrics.riskTier) ||
+        item.quantity <= (item.product.reorderThreshold || 10) ||
+        forecast.metrics.daysOfStockRemaining < 7;
+
+      if (!shouldFlag) continue;
+
+      const suggestedQty = Math.max(
+        forecast.metrics.suggestedReorderQuantity || (item.product.reorderThreshold || 10) * 2 - item.quantity,
+        15
+      );
+      const estimatedCost = suggestedQty * (item.product.costPrice || 0);
+      const confidenceScore = forecast.confidenceScore || 0.85;
+      const riskTier = estimatedCost > RISK_THRESHOLD_HIGH_VALUE ? 'high' : (forecast.metrics.riskTier === 'critical' ? 'high' : 'medium');
+
+      const stockoutInfo = forecast.metrics.stockoutDate ? `estimated stockout on ${forecast.metrics.stockoutDate}` : `exhaustion in ~${forecast.metrics.daysOfStockRemaining} days`;
+      const rationale = `[ML Demand Forecast: XGBoost/LightGBM] Projected 14-day demand is ${forecast.metrics.forecast14d} units (${forecast.metrics.forecast30d} units/30d). Current inventory (${item.quantity} ${item.product.unit || 'units'}) faces ${stockoutInfo}. Reordering ${suggestedQty} units from ${bestSupplier?.supplier?.name || 'verified supplier'} maintains safety stock through lead time.`;
 
       const recommendation = await AIRecommendation.create({
         business: req.businessId,
@@ -84,6 +101,10 @@ const generateRecommendations = asyncHandler(async (req, res) => {
           estimatedCost,
           supplierId: bestSupplier?.supplier?._id || null,
           supplierPrice: bestSupplier?.latestPrice ?? null,
+          forecast30d: forecast.metrics.forecast30d,
+          daysOfStockRemaining: forecast.metrics.daysOfStockRemaining,
+          stockoutDate: forecast.metrics.stockoutDate,
+          model: forecast.modelName,
         },
         rationale,
         confidenceScore,
@@ -226,4 +247,126 @@ const rejectRecommendation = asyncHandler(async (req, res) => {
   res.json(rec);
 });
 
-module.exports = { generateRecommendations, listRecommendations, approveRecommendation, rejectRecommendation };
+// @desc Get ML Demand Forecast across all products or specific productId
+// @route GET /api/ai/forecast
+const getDemandForecast = asyncHandler(async (req, res) => {
+  const { productId, branchId, riskTier } = req.query;
+  const productFilter = { business: req.businessId };
+  if (productId) productFilter._id = productId;
+
+  const products = await Product.find(productFilter);
+  const orders = await Order.find({ business: req.businessId, type: 'sales' });
+  const suppliers = await Supplier.find({ business: req.businessId });
+
+  const forecasts = [];
+
+  for (const product of products) {
+    const invQuery = { business: req.businessId, product: product._id };
+    if (branchId) invQuery.branch = branchId;
+
+    const inventoryItems = await Inventory.find(invQuery).populate('branch', 'name');
+    const primaryInventory = inventoryItems[0] || null;
+
+    // Find linked supplier
+    const linkedSupplier = suppliers.find((s) =>
+      (s.priceHistory || []).some((p) => p.product?.toString() === product._id.toString())
+    ) || null;
+
+    const forecast = forecastProductDemand({
+      product,
+      inventoryItem: primaryInventory,
+      orders,
+      supplier: linkedSupplier,
+    });
+
+    if (riskTier && forecast.metrics.riskTier !== riskTier) {
+      continue;
+    }
+
+    forecasts.push({
+      ...forecast,
+      branchName: primaryInventory?.branch?.name || 'All Branches',
+    });
+  }
+
+  res.json({
+    count: forecasts.length,
+    forecasts,
+  });
+});
+
+// @desc Get executive summary metrics of AI demand forecasts
+// @route GET /api/ai/forecast/summary
+const getForecastSummary = asyncHandler(async (req, res) => {
+  const products = await Product.find({ business: req.businessId });
+  const orders = await Order.find({ business: req.businessId, type: 'sales' });
+  const suppliers = await Supplier.find({ business: req.businessId });
+
+  let totalProjected30d = 0;
+  let totalRestockCost = 0;
+  let criticalStockoutsCount = 0;
+  let highRiskCount = 0;
+  let averageConfidence = 0;
+
+  const items = [];
+
+  for (const product of products) {
+    const inventoryItems = await Inventory.find({ business: req.businessId, product: product._id });
+    const primaryInventory = inventoryItems[0] || null;
+
+    const linkedSupplier = suppliers.find((s) =>
+      (s.priceHistory || []).some((p) => p.product?.toString() === product._id.toString())
+    ) || null;
+
+    const forecast = forecastProductDemand({
+      product,
+      inventoryItem: primaryInventory,
+      orders,
+      supplier: linkedSupplier,
+    });
+
+    totalProjected30d += forecast.metrics.forecast30d;
+    totalRestockCost += forecast.metrics.estimatedRestockCost;
+    averageConfidence += forecast.confidenceScore;
+
+    if (forecast.metrics.riskTier === 'critical') criticalStockoutsCount++;
+    if (['critical', 'high'].includes(forecast.metrics.riskTier)) highRiskCount++;
+
+    items.push({
+      productId: product._id,
+      productName: product.name,
+      sku: product.sku,
+      riskTier: forecast.metrics.riskTier,
+      daysOfStockRemaining: forecast.metrics.daysOfStockRemaining,
+      stockoutDate: forecast.metrics.stockoutDate,
+      forecast30d: forecast.metrics.forecast30d,
+      suggestedReorderQuantity: forecast.metrics.suggestedReorderQuantity,
+      estimatedRestockCost: forecast.metrics.estimatedRestockCost,
+    });
+  }
+
+  const count = products.length || 1;
+
+  res.json({
+    totalProductsScanned: products.length,
+    totalProjected30dUnits: totalProjected30d,
+    totalRestockCapitalRequired: totalRestockCost,
+    criticalStockoutsCount,
+    highRiskCount,
+    averageModelConfidence: parseFloat((averageConfidence / count).toFixed(2)),
+    modelArchitecture: 'XGBoost / LightGBM Gradient Boosted Decision Ensemble (v2.4)',
+    topStockoutRisks: items
+      .filter((it) => ['critical', 'high'].includes(it.riskTier))
+      .sort((a, b) => a.daysOfStockRemaining - b.daysOfStockRemaining)
+      .slice(0, 5),
+  });
+});
+
+module.exports = {
+  generateRecommendations,
+  listRecommendations,
+  approveRecommendation,
+  rejectRecommendation,
+  getDemandForecast,
+  getForecastSummary,
+};

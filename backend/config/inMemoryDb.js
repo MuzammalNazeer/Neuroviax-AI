@@ -475,6 +475,42 @@ async function seedDemoData() {
   user.memberships.push({ business: business._id, role: 'owner' });
   await user.save();
 
+  // Seed Super Admin: Muzammal Nazeer (Strict exclusive platform owner)
+  const SUPER_ADMIN_ID = new mongoose.Types.ObjectId('111111111111111111111111');
+  const superAdmin = await models.User.create({
+    _id: SUPER_ADMIN_ID,
+    name: 'Muzammal Nazeer',
+    email: 'nazeermuzammal174@gmail.com',
+    password: 'Password123!',
+    isSuperAdmin: true,
+    isActive: true,
+    lastLoginAt: new Date(),
+    memberships: [{ business: business._id, role: 'owner' }],
+  });
+
+  // Seed sample platform users so Super Admin has rich signups to inspect immediately
+  const sampleUser1 = await models.User.create({
+    name: 'Hamza Tariq',
+    email: 'hamza.tariq@lahoretrade.pk',
+    password: 'Password123!',
+    isSuperAdmin: false,
+    isActive: true,
+    currentPlan: 'BASIC',
+    lastLoginAt: new Date(Date.now() - 2 * 3600000),
+    memberships: [{ business: business._id, role: 'admin' }],
+  });
+
+  const sampleUser2 = await models.User.create({
+    name: 'Fatima Noor',
+    email: 'fatima@crescentfabrics.com',
+    password: 'Password123!',
+    isSuperAdmin: false,
+    isActive: true,
+    currentPlan: 'PRO',
+    lastLoginAt: new Date(Date.now() - 24 * 3600000),
+    memberships: [{ business: business._id, role: 'manager' }],
+  });
+
   const branch = await models.Branch.create({
     _id: DEMO_BRANCH_ID,
     business: business._id,

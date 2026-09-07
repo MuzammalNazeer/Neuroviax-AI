@@ -3,11 +3,21 @@ const router = express.Router();
 const { protect, requireBusinessContext } = require('../middleware/auth');
 const { allowRoles } = require('../middleware/rbac');
 const {
-  generateRecommendations, listRecommendations, approveRecommendation, rejectRecommendation,
+  generateRecommendations,
+  listRecommendations,
+  approveRecommendation,
+  rejectRecommendation,
+  getDemandForecast,
+  getForecastSummary,
 } = require('../controllers/aiController');
 
 router.use(protect, requireBusinessContext);
 
+// ML Demand Forecasting Endpoints
+router.get('/forecast', getDemandForecast);
+router.get('/forecast/summary', getForecastSummary);
+
+// AI Recommendation Engine Endpoints
 router.post('/recommendations/generate', allowRoles('owner', 'admin', 'manager'), generateRecommendations);
 router.get('/recommendations', listRecommendations);
 router.patch('/recommendations/:id/approve', allowRoles('owner', 'admin', 'manager'), approveRecommendation);

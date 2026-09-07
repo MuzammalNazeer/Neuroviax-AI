@@ -17,6 +17,7 @@ import Payments from './pages/Payments';
 import Customers from './pages/Customers';
 import Suppliers from './pages/Suppliers';
 import Recommendations from './pages/Recommendations';
+import DemandForecasting from './pages/DemandForecasting';
 import AIAssistants from './pages/AIAssistants';
 import Team from './pages/Team';
 import Expenses from './pages/Expenses';
@@ -28,6 +29,8 @@ import CheckoutSuccess from './pages/CheckoutSuccess';
 import CheckoutCancel from './pages/CheckoutCancel';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import SuperAdminRoute from './components/SuperAdminRoute';
+import AdminDashboard from './pages/AdminDashboard';
 
 const App: React.FC = () => {
   return (
@@ -74,8 +77,17 @@ const App: React.FC = () => {
         <Route path="subscription/success" element={<CheckoutSuccess />} />
         <Route path="subscription/cancel" element={<CheckoutCancel />} />
         <Route path="recommendations" element={<Recommendations />} />
+        <Route path="demand-forecasting" element={<DemandForecasting />} />
         <Route path="ai-assistants" element={<AIAssistants />} />
         <Route path="team" element={<Team />} />
+        <Route
+          path="admin"
+          element={
+            <SuperAdminRoute>
+              <AdminDashboard />
+            </SuperAdminRoute>
+          }
+        />
       </Route>
 
       {/* Fallback route */}

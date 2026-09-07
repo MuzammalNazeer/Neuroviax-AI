@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { isUserSuperAdmin } from '../store/useAuthStore';
 import SEO from './SEO';
 import {
   LayoutDashboard,
@@ -36,6 +37,7 @@ import {
   Menu,
   X,
   ExternalLink,
+  TrendingUp,
 } from 'lucide-react';
 import api from '../api/axios';
 
@@ -52,8 +54,9 @@ const ALL_NAV_ITEMS = [
   { to: '/integrations', label: 'Integrations', icon: Plug, group: 'admin', roles: ['owner', 'admin'], badge: 'API' },
   { to: '/subscription', label: 'Subscription', icon: Crown, group: 'admin', roles: ['owner', 'admin', 'manager', 'accountant', 'staff'] },
   { to: '/team', label: 'Team & Admin', icon: UserCog, group: 'admin', roles: ['owner', 'admin', 'manager'], badge: 'ADMIN' },
-  { to: '/ai-assistants', label: 'AI Assistants', icon: Bot, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'NEW' },
+  { to: '/demand-forecasting', label: 'Demand Forecasting', icon: TrendingUp, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'ML' },
   { to: '/recommendations', label: 'AI Recommendations', icon: Sparkles, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'AI' },
+  { to: '/ai-assistants', label: 'AI Assistants', icon: Bot, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'NEW' },
 ];
 
 const ROLE_STYLES: Record<string, { label: string; badge: string; icon: React.ComponentType<any>; iconColor: string }> = {
@@ -274,6 +277,42 @@ const Layout: React.FC = () => {
               </NavLink>
             );
           })}
+
+          {/* Exclusive Super Admin Console - Strictly for Muzammal Nazeer */}
+          {isUserSuperAdmin(user) && (
+            <div className="pt-2">
+              <p className="text-[9px] font-black text-amber-400 uppercase tracking-widest px-3 pt-3 pb-1.5 flex items-center gap-1.5">
+                <Crown className="w-3 h-3 text-amber-400" />
+                <span>Super Admin</span>
+              </p>
+              <NavLink to="/admin" className="relative block">
+                {location.pathname.startsWith('/admin') && (
+                  <motion.div
+                    layoutId="activeSidebarIndicator"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    className="absolute inset-0 bg-amber-400/20 rounded-xl border border-amber-400/40 shadow-inner"
+                  />
+                )}
+                <motion.div
+                  whileHover={{ x: 2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`relative flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+                    location.pathname.startsWith('/admin')
+                      ? 'text-amber-200 font-bold'
+                      : 'text-amber-300/80 hover:text-white hover:bg-amber-400/10'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Super Admin Console</span>
+                  </div>
+                  <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                    OWNER
+                  </span>
+                </motion.div>
+              </NavLink>
+            </div>
+          )}
         </nav>
 
         {/* Security badge */}
