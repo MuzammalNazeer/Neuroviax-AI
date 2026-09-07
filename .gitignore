@@ -6,3 +6,4 @@ build/
 *.tsbuildinfo
 .DS_Store
 .vite/
+*.in_memory_store.json
