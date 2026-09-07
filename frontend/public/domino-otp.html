@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Domino Flip & Fusion OTP — Ultra-Smooth 60FPS UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #030712;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(51, 65, 85, 0.5);
+      --accent-emerald: #10b981;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --accent-laser: #00f2fe;
+      --laser-glow: rgba(6, 182, 212, 0.85);
+      --domino-front-bg: linear-gradient(145deg, #1e293b, #0f172a);
+      --domino-back-bg: linear-gradient(145deg, #064e3b, #022c22);
+      --domino-border: rgba(148, 163, 184, 0.18);
+      --domino-active-border: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 20%, #0c1527 0%, #030712 80%);
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-x: hidden;
+      perspective: 1200px;
+    }
+
+    /* Ambient Cyber Gradients & Grid */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.25;
+      animation: pulseOrb 8s ease-in-out infinite alternate;
+      will-change: transform, opacity;
+    }
+
+    .ambient-orb-1 {
+      width: 500px;
+      height: 500px;
+      top: 10%;
+      left: 15%;
+      background: #10b981;
+    }
+
+    .ambient-orb-2 {
+      width: 450px;
+      height: 450px;
+      bottom: 10%;
+      right: 15%;
+      background: #06b6d4;
+      animation-delay: -4s;
+    }
+
+    .ambient-orb-3 {
+      width: 350px;
+      height: 350px;
+      top: 40%;
+      left: 60%;
+      background: #8b5cf6;
+      opacity: 0.15;
+    }
+
+    @keyframes pulseOrb {
+      0% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.2; }
+      100% { transform: translate3d(30px, -20px, 0) scale(1.15); opacity: 0.35; }
+    }
+
+    .cyber-grid {
+      position: fixed;
+      inset: 0;
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Main Container with 3D Tilt */
+    .otp-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 540px;
+      background: rgba(13, 20, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 32px;
+      padding: 44px 36px;
+      box-shadow: 
+        0 25px 60px -15px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      transform-style: preserve-3d;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    /* Header Section */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #34d399;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+      animation: blink 1.6s infinite ease-in-out;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.7); }
+    }
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .header-sub {
+      font-size: 13.5px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+
+    .email-highlight {
+      color: #38bdf8;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Hidden Real Input for Accessibility & Keyboard Handling */
+    #hiddenOtpInput {
+      position: absolute;
+      opacity: 0;
+      pointer-events: auto;
+      width: 100%;
+      height: 90px;
+      top: 180px;
+      left: 0;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    /* 3D DOMINO STAGE */
+    .domino-stage {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      perspective: 1000px;
+      margin-bottom: 32px;
+      padding: 16px 0;
+      cursor: pointer;
+    }
+
+    /* Laser Sweep Track & Beam */
+    .laser-track {
+      position: absolute;
+      inset: -6px -12px;
+      pointer-events: none;
+      z-index: 15;
+      overflow: hidden;
+      border-radius: 20px;
+    }
+
+    .laser-beam {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #ffffff;
+      box-shadow: 
+        0 0 8px #ffffff,
+        0 0 18px var(--accent-laser),
+        0 0 35px var(--accent-cyan),
+        0 0 60px var(--accent-emerald);
+      transform: translate3d(-150px, 0, 0);
+      opacity: 0;
+      border-radius: 4px;
+      filter: blur(0.5px);
+      will-change: transform, opacity;
+    }
+
+    .laser-flare {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(6, 182, 212, 0.4) 40%, transparent 80%);
+      border-radius: 50%;
+      filter: blur(4px);
+    }
+
+    /* Active Laser Animation */
+    .laser-beam.active-sweep {
+      animation: sweepMotion 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes sweepMotion {
+      0% {
+        transform: translate3d(-50px, 0, 0);
+        opacity: 0;
+      }
+      15% {
+        opacity: 1;
+      }
+      85% {
+        opacity: 1;
+      }
+      100% {
+        transform: translate3d(560px, 0, 0);
+        opacity: 0;
+      }
+    }
+
+    /* FUSION LASER SCAN (Continuous when all filled) */
+    .laser-beam.fusion-sweep {
+      animation: continuousFusion 1.4s ease-in-out infinite alternate;
+      opacity: 1;
+    }
+
+    @keyframes continuousFusion {
+      0% {
+        transform: translate3d(0px, 0, 0);
+      }
+      100% {
+        transform: translate3d(500px, 0, 0);
+      }
+    }
+
+    /* 3D DOMINO TILE UNIT */
+    .domino-tile {
+      flex: 1;
+      height: 78px;
+      position: relative;
+      perspective: 800px;
+      transform-style: preserve-3d;
+      user-select: none;
+    }
+
+    .domino-card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+      border-radius: 18px;
+      will-change: transform;
+    }
+
+    /* 3D Faces */
+    .domino-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 800;
+      box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.6);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    }
+
+    /* Front Face (Blank / Placeholder / Idle state) */
+    .domino-face.front {
+      background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+      border: 1.5px solid rgba(148, 163, 184, 0.15);
+      color: #64748b;
+      transform: rotateY(0deg) translateZ(1px);
+    }
+
+    .domino-placeholder-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #475569;
+      transition: all 0.25s ease;
+    }
+
+    /* Focused tile state */
+    .domino-tile.is-active .domino-face.front {
+      border-color: rgba(6, 182, 212, 0.7);
+      background: linear-gradient(160deg, #1e293b 0%, #0f233a 100%);
+      box-shadow: 
+        0 0 20px rgba(6, 182, 212, 0.25),
+        inset 0 0 12px rgba(6, 182, 212, 0.15);
+    }
+
+    .domino-tile.is-active .domino-placeholder-dot {
+      background: #06b6d4;
+      box-shadow: 0 0 10px #06b6d4;
+      transform: scale(1.4);
+      animation: dotPulse 1s infinite alternate;
+    }
+
+    @keyframes dotPulse {
+      0% { transform: scale(1.2); opacity: 0.7; }
+      100% { transform: scale(1.6); opacity: 1; }
+    }
+
+    /* Back Face (Filled / Flipped state) */
+    .domino-face.back {
+      background: linear-gradient(160deg, #064e3b 0%, #022c22 100%);
+      border: 1.5px solid #10b981;
+      color: #ecfdf5;
+      transform: rotateY(180deg) translateZ(1px);
+      text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+      box-shadow: 
+        0 10px 25px -5px rgba(16, 185, 129, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    /* Flipped Domino State */
+    .domino-tile.is-flipped .domino-card {
+      transform: rotateY(180deg) translateZ(6px);
+    }
+
+    /* 3D Depth Extrusion Layers (Simulates Real Domino Thickness) */
+    .domino-edge-left,
+    .domino-edge-right {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      width: 8px;
+      background: #0b1329;
+      opacity: 0.6;
+      border-radius: 4px;
+      backface-visibility: hidden;
+    }
+
+    .domino-edge-left {
+      left: -4px;
+      transform: rotateY(-90deg);
+    }
+
+    .domino-edge-right {
+      right: -4px;
+      transform: rotateY(90deg);
+    }
+
+    /* Domino Sequential Cascade Keyframes */
+    @keyframes dominoIntro {
+      0% {
+        transform: rotateX(70deg) translateZ(-60px);
+        opacity: 0;
+      }
+      50% {
+        transform: rotateX(-15deg) translateZ(15px);
+        opacity: 0.8;
+      }
+      100% {
+        transform: rotateX(0deg) translateZ(0);
+        opacity: 1;
+      }
+    }
+
+    .domino-tile.intro-wave {
+      animation: dominoIntro 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    /* FUSION MODE (When all 6 are verified / entered) */
+    .domino-stage.fusion-active .domino-tile .domino-face.back {
+      background: linear-gradient(160deg, #047857 0%, #064e3b 100%);
+      border-color: #34d399;
+      box-shadow: 
+        0 0 25px rgba(16, 185, 129, 0.5),
+        0 0 50px rgba(6, 182, 212, 0.25),
+        inset 0 0 15px rgba(52, 211, 153, 0.4);
+      animation: fusionPulse 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes fusionPulse {
+      0% {
+        transform: rotateY(180deg) translateZ(6px) scale(1);
+        filter: brightness(1);
+      }
+      100% {
+        transform: rotateY(180deg) translateZ(12px) scale(1.03);
+        filter: brightness(1.25);
+      }
+    }
+
+    /* Energy Ripple Line under Stage */
+    .fusion-line {
+      height: 2px;
+      width: 100%;
+      background: linear-gradient(90deg, transparent, #10b981, #06b6d4, #8b5cf6, transparent);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      margin-top: -16px;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 8px #10b981);
+    }
+
+    .domino-stage.fusion-active + .fusion-line {
+      opacity: 1;
+      animation: rippleGlow 2s infinite linear;
+    }
+
+    @keyframes rippleGlow {
+      0% { filter: drop-shadow(0 0 6px #10b981); }
+      50% { filter: drop-shadow(0 0 14px #06b6d4); }
+      100% { filter: drop-shadow(0 0 6px #10b981); }
+    }
+
+    /* Action Controls & Footer */
+    .action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .btn-verify {
+      position: relative;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
+      border: none;
+      border-radius: 16px;
+      color: #022c22;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+      transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-verify:hover {
+      background: linear-gradient(135deg, #34d399 0%, #14b8a6 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px -5px rgba(16, 185, 129, 0.55);
+    }
+
+    .btn-verify:active {
+      transform: translateY(1px);
+    }
+
+    .btn-verify::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent 40%, rgba(255, 255, 255, 0.4) 50%, transparent 60%);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .btn-verify:hover::after {
+      transform: translateX(100%);
+    }
+
+    .demo-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .btn-tool {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-tool:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: #f1f5f9;
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    /* Status & Feedback banner */
+    .status-banner {
+      min-height: 24px;
+      margin-top: 14px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .status-banner.success {
+      color: #34d399;
+    }
+
+    .status-banner.error {
+      color: #f43f5e;
+    }
+
+    .status-banner.info {
+      color: #38bdf8;
+    }
+
+    /* Sound indicator pill */
+    .sound-badge {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
+    }
+
+    .sound-badge:hover {
+      color: #38bdf8;
+      background: rgba(6, 182, 212, 0.1);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+
+    /* Responsive */
+    @media (max-width: 520px) {
+      .otp-wrapper {
+        padding: 32px 20px;
+        border-radius: 24px;
+      }
+      .domino-tile {
+        height: 64px;
+      }
+      .domino-face {
+        font-size: 22px;
+        border-radius: 14px;
+      }
+      .header-title {
+        font-size: 23px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Field -->
+  <div class="ambient-bg">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+  <div class="cyber-grid"></div>
+
+  <!-- Main 3D Card Shell -->
+  <div class="otp-wrapper" id="cardWrapper">
+    <!-- Sound Toggle Indicator -->
+    <div class="sound-badge" id="soundToggle" title="Audio synthesized dynamically via Web Audio API">
+      <span id="soundIcon">🔊</span>
+      <span id="soundLabel">Audio FX</span>
+    </div>
+
+    <!-- Top Badge -->
+    <div class="badge">
+      <span class="badge-dot"></span>
+      <span>GPU-Accelerated 3D Engine</span>
+    </div>
+
+    <!-- Title & Subtitle -->
+    <h1 class="header-title">Enter Verification Code</h1>
+    <p class="header-sub">
+      Domino flip authentication for <span class="email-highlight">user@neuroviax.ai</span>
+    </p>
+
+    <!-- Hidden Native Input for zero-friction mobile/desktop typing & pasting -->
+    <input 
+      type="text" 
+      id="hiddenOtpInput" 
+      maxlength="6" 
+      inputmode="numeric" 
+      autocomplete="one-time-code"
+      autofocus 
+      aria-label="6-Digit Verification Code"
+    />
+
+    <!-- 3D DOMINO STAGE -->
+    <div class="domino-stage" id="dominoStage">
+      <!-- Laser Sweep Track -->
+      <div class="laser-track">
+        <div class="laser-beam" id="laserBeam">
+          <div class="laser-flare"></div>
+        </div>
+      </div>
+
+      <!-- 6 3D Domino Tiles -->
+      <!-- Tile 0 -->
+      <div class="domino-tile is-active" data-index="0" style="--i: 0;">
+        <div class="domino-card">
+          <div class="domino-edge-left"></div>
+          <div class="domino-edge-right"></div>
+          <div class="domino-face front">
+            <span class="domino-placeholder-dot"></span>
+          </div>
+          <div class="domino-face back">
+            <span class="domino-digit"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 1 -->
+      <div class="domino-tile" data-index="1" style="--i: 1;">
+        <div class="domino-card">
+          <div class="domino-edge-left"></div>
+          <div class="domino-edge-right"></div>
+          <div class="domino-face front">
+            <span class="domino-placeholder-dot"></span>
+          </div>
+          <div class="domino-face back">
+            <span class="domino-digit"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 2 -->
+      <div class="domino-tile" data-index="2" style="--i: 2;">
+        <div class="domino-card">
+          <div class="domino-edge-left"></div>
+          <div class="domino-edge-right"></div>
+          <div class="domino-face front">
+            <span class="domino-placeholder-dot"></span>
+          </div>
+          <div class="domino-face back">
+            <span class="domino-digit"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 3 -->
+      <div class="domino-tile" data-index="3" style="--i: 3;">
+        <div class="domino-card">
+          <div class="domino-edge-left"></div>
+          <div class="domino-edge-right"></div>
+          <div class="domino-face front">
+            <span class="domino-placeholder-dot"></span>
+          </div>
+          <div class="domino-face back">
+            <span class="domino-digit"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 4 -->
+      <div class="domino-tile" data-index="4" style="--i: 4;">
+        <div class="domino-card">
+          <div class="domino-edge-left"></div>
+          <div class="domino-edge-right"></div>
+          <div class="domino-face front">
+            <span class="domino-placeholder-dot"></span>
+          </div>
+          <div class="domino-face back">
+            <span class="domino-digit"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 5 -->
+      <div class="domino-tile" data-index="5" style="--i: 5;">
+        <div class="domino-card">
+          <div class="domino-edge-left"></div>
+          <div class="domino-edge-right"></div>
+          <div class="domino-face front">
+            <span class="domino-placeholder-dot"></span>
+          </div>
+          <div class="domino-face back">
+            <span class="domino-digit"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fusion Ripple Line -->
+    <div class="fusion-line"></div>
+
+    <!-- Action Group -->
+    <div class="action-group">
+      <button class="btn-verify" id="btnVerify">
+        <span>Verify &amp; Authenticate</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+
+      <!-- Demo Trigger Buttons -->
+      <div class="demo-bar">
+        <button class="btn-tool" id="btnWave">
+          <span>🎲 Domino Wave</span>
+        </button>
+        <button class="btn-tool" id="btnLaser">
+          <span>⚡ Laser Sweep</span>
+        </button>
+      </div>
+
+      <div class="demo-bar">
+        <button class="btn-tool" id="btnAutofill">
+          <span>🔑 Auto-Fill OTP (849261)</span>
+        </button>
+        <button class="btn-tool" id="btnClear">
+          <span>↺ Reset</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Feedback Banner -->
+    <div class="status-banner" id="statusBanner">
+      <span id="statusText">Type or paste your 6-digit security code</span>
+    </div>
+  </div>
+
+  <script>
+    /* ─── Web Audio API Dynamic Sound Synthesizer (Zero External Assets) ─── */
+    let audioEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type = 'click', freqOffset = 0) {
+      if (!audioEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'flip') {
+          // Tactile 3D Domino snap click
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320 + freqOffset * 70, now);
+          osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'laser') {
+          // Laser beam sweep swoosh
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(850, now);
+          osc.frequency.exponentialRampToValueAtTime(240, now + 0.35);
+
+          gain.gain.setValueAtTime(0.22, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'fusion') {
+          // Energetic harmonic chime for completed Fusion
+          [440, 554.37, 659.25, 880].forEach((freq, i) => {
+            const hOsc = audioCtx.createOscillator();
+            const hGain = audioCtx.createGain();
+            hOsc.connect(hGain);
+            hGain.connect(audioCtx.destination);
+
+            hOsc.type = 'sine';
+            hOsc.frequency.setValueAtTime(freq, now + i * 0.06);
+
+            hGain.gain.setValueAtTime(0.12, now + i * 0.06);
+            hGain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.06 + 0.45);
+
+            hOsc.start(now + i * 0.06);
+            hOsc.stop(now + i * 0.06 + 0.5);
+          });
+        }
+      } catch (err) {
+        // Safe fallback
+      }
+    }
+
+    // Toggle Audio
+    const soundToggle = document.getElementById('soundToggle');
+    const soundIcon = document.getElementById('soundIcon');
+    const soundLabel = document.getElementById('soundLabel');
+
+    soundToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audioEnabled = !audioEnabled;
+      soundIcon.textContent = audioEnabled ? '🔊' : '🔇';
+      soundLabel.textContent = audioEnabled ? 'Audio FX' : 'Muted';
+      if (audioEnabled) {
+        initAudio();
+        playSound('flip', 2);
+      }
+    });
+
+    /* ─── 3D Interactive Domino Controller ─── */
+    const OTP_LENGTH = 6;
+    const input = document.getElementById('hiddenOtpInput');
+    const dominoStage = document.getElementById('dominoStage');
+    const tiles = Array.from(document.querySelectorAll('.domino-tile'));
+    const laserBeam = document.getElementById('laserBeam');
+    const statusBanner = document.getElementById('statusBanner');
+    const statusText = document.getElementById('statusText');
+    const cardWrapper = document.getElementById('cardWrapper');
+
+    let currentOtp = '';
+
+    // Click anywhere on stage focuses input
+    dominoStage.addEventListener('click', () => {
+      input.focus();
+    });
+
+    // Update Domino 3D visual state
+    function renderDominoes(val, animateLast = true) {
+      const prevLength = currentOtp.length;
+      currentOtp = val;
+
+      tiles.forEach((tile, index) => {
+        const digitSpan = tile.querySelector('.domino-digit');
+        const char = val[index] || '';
+
+        // Active indicator (where cursor is currently located)
+        if (index === val.length || (val.length === OTP_LENGTH && index === OTP_LENGTH - 1)) {
+          tile.classList.add('is-active');
+        } else {
+          tile.classList.remove('is-active');
+        }
+
+        // Domino flip state
+        if (char) {
+          digitSpan.textContent = char;
+          if (!tile.classList.contains('is-flipped')) {
+            tile.classList.add('is-flipped');
+            if (animateLast && index === val.length - 1) {
+              playSound('flip', index);
+            }
+          }
+        } else {
+          if (tile.classList.contains('is-flipped')) {
+            tile.classList.remove('is-flipped');
+            playSound('flip', 0);
+          }
+          digitSpan.textContent = '';
+        }
+      });
+
+      // Handle Fusion state when 6 digits are reached
+      if (val.length === OTP_LENGTH) {
+        activateFusion();
+      } else {
+        deactivateFusion();
+      }
+    }
+
+    // Input Change Handler
+    input.addEventListener('input', (e) => {
+      // Filter out non-digits
+      const sanitized = e.target.value.replace(/\D/g, '').slice(0, OTP_LENGTH);
+      e.target.value = sanitized;
+      renderDominoes(sanitized, true);
+
+      if (sanitized.length < OTP_LENGTH) {
+        statusBanner.className = 'status-banner info';
+        statusText.textContent = `${OTP_LENGTH - sanitized.length} digit${OTP_LENGTH - sanitized.length > 1 ? 's' : ''} remaining...`;
+      }
+    });
+
+    // Laser Sweep Trigger
+    function triggerLaserSweep() {
+      laserBeam.classList.remove('active-sweep');
+      void laserBeam.offsetWidth; // force DOM reflow
+      laserBeam.classList.add('active-sweep');
+      playSound('laser');
+
+      // Add a slight luminous domino wave response
+      tiles.forEach((tile, i) => {
+        setTimeout(() => {
+          tile.querySelector('.domino-card').style.boxShadow = '0 0 25px rgba(6, 182, 212, 0.7)';
+          setTimeout(() => {
+            tile.querySelector('.domino-card').style.boxShadow = '';
+          }, 350);
+        }, 120 + i * 85);
+      });
+    }
+
+    // Trigger Domino Cascading Wave
+    function triggerDominoWave() {
+      triggerLaserSweep();
+      tiles.forEach((tile, i) => {
+        tile.classList.remove('intro-wave');
+        void tile.offsetWidth;
+        setTimeout(() => {
+          tile.classList.add('intro-wave');
+          playSound('flip', i);
+        }, i * 75);
+      });
+    }
+
+    // Activate Fusion
+    function activateFusion() {
+      dominoStage.classList.add('fusion-active');
+      laserBeam.classList.remove('active-sweep');
+      laserBeam.classList.add('fusion-sweep');
+      playSound('fusion');
+
+      statusBanner.className = 'status-banner success';
+      statusText.innerHTML = '✨ <strong>Fusion Locked!</strong> Ready for authentication.';
+    }
+
+    function deactivateFusion() {
+      dominoStage.classList.remove('fusion-active');
+      laserBeam.classList.remove('fusion-sweep');
+    }
+
+    /* ─── Buttons & Controls ─── */
+    document.getElementById('btnWave').addEventListener('click', () => {
+      triggerDominoWave();
+    });
+
+    document.getElementById('btnLaser').addEventListener('click', () => {
+      triggerLaserSweep();
+    });
+
+    document.getElementById('btnAutofill').addEventListener('click', () => {
+      const code = '849261';
+      input.value = '';
+      renderDominoes('');
+      triggerLaserSweep();
+
+      // Sequential domino typing simulation
+      code.split('').forEach((char, i) => {
+        setTimeout(() => {
+          input.value = code.slice(0, i + 1);
+          renderDominoes(input.value, true);
+        }, 200 + i * 90);
+      });
+    });
+
+    document.getElementById('btnClear').addEventListener('click', () => {
+      input.value = '';
+      renderDominoes('', false);
+      statusBanner.className = 'status-banner';
+      statusText.textContent = 'Type or paste your 6-digit security code';
+      input.focus();
+    });
+
+    document.getElementById('btnVerify').addEventListener('click', () => {
+      if (currentOtp.length < OTP_LENGTH) {
+        statusBanner.className = 'status-banner error';
+        statusText.textContent = `⚠️ Incomplete code. Please fill all ${OTP_LENGTH} digits.`;
+        // Shake animation
+        cardWrapper.style.transform = 'translateX(-10px)';
+        setTimeout(() => { cardWrapper.style.transform = 'translateX(10px)'; }, 80);
+        setTimeout(() => { cardWrapper.style.transform = 'translateX(-6px)'; }, 160);
+        setTimeout(() => { cardWrapper.style.transform = 'translateX(6px)'; }, 240);
+        setTimeout(() => { cardWrapper.style.transform = ''; }, 320);
+        return;
+      }
+
+      // Successful verification preview
+      triggerLaserSweep();
+      playSound('fusion');
+      statusBanner.className = 'status-banner success';
+      statusText.innerHTML = '🎉 <strong>Authentication Successful!</strong> Redirecting...';
+    });
+
+    /* ─── 60 FPS Gyroscopic Mouse Parallax (Pure CSS 3D Tilt) ─── */
+    let mouseMoveScheduled = false;
+    let targetRotateX = 0;
+    let targetRotateY = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      if (window.innerWidth < 768) return; // disable on mobile
+      const { innerWidth, innerHeight } = window;
+      const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+      const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+
+      targetRotateY = x * 10; // max 10 deg yaw
+      targetRotateX = -y * 8; // max 8 deg pitch
+
+      if (!mouseMoveScheduled) {
+        mouseMoveScheduled = true;
+        requestAnimationFrame(() => {
+          cardWrapper.style.transform = `rotateX(${targetRotateX}deg) rotateY(${targetRotateY}deg)`;
+          mouseMoveScheduled = false;
+        });
+      }
+    });
+
+    window.addEventListener('mouseleave', () => {
+      cardWrapper.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+
+    // Initial load intro domino wave
+    window.addEventListener('DOMContentLoaded', () => {
+      triggerDominoWave();
+      input.focus();
+    });
+  </script>
+</body>
+</html>

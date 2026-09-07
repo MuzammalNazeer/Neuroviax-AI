@@ -1,0 +1,49 @@
+# Neuroviax AI - Technical SEO robots.txt
+# Platform: https://neuroviax.ai
+
+User-agent: *
+Allow: /
+Allow: /landing
+Allow: /login
+Allow: /register
+Allow: /signup
+Allow: /favicon.svg
+Allow: /sitemap.xml
+
+# Protected app routes (authenticated SME dashboards)
+Disallow: /api/
+Disallow: /products
+Disallow: /inventory
+Disallow: /orders
+Disallow: /payments
+Disallow: /expenses
+Disallow: /customers
+Disallow: /suppliers
+Disallow: /reports
+Disallow: /integrations
+Disallow: /subscription
+Disallow: /recommendations
+Disallow: /ai-assistants
+Disallow: /team
+Disallow: /forgot-password
+Disallow: /verify-otp
+Disallow: /reset-password
+Disallow: /auth/callback
+
+# Crawlers
+User-agent: Googlebot
+Allow: /
+Allow: /landing
+Allow: /login
+Allow: /register
+
+User-agent: Bingbot
+Allow: /
+Allow: /landing
+Allow: /login
+Allow: /register
+
+# Sitemap specification
+Sitemap: https://neuroviax.ai/sitemap.xml
+Host: https://neuroviax.ai
+
