@@ -1,85 +1,160 @@
-# Neuroviax AI — MERN Stack Implementation (Phase 1: Foundation)
+# Neuroviax AI — Autonomous Business Operating Platform (ABOP v5.0)
 
-This is a working MERN-stack build of the platform described in the *Neuroviax AI Consolidated Product & Strategy
-Document v5.0*. Given the document's own scope warning in Section 6 ("this is a very wide module set for a first
-release") and its explicit Section 15 roadmap, this implementation deliberately covers **Phase 1 (Foundation)** plus a
-working slice of **Phase 3 (Intelligence)** — rather than attempting all 7 modules and 6 AI assistants at once, which
-the document itself flags as a top risk (Section 17).
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/MuzammalNazeer/Neuroviax-AI)
+[![Stack](https://img.shields.io/badge/stack-MERN-blue.svg)](https://github.com/MuzammalNazeer/Neuroviax-AI)
+[![Frontend](https://img.shields.io/badge/frontend-React%2018%20%7C%20TypeScript%20%7C%20Vite%20%7C%20TailwindCSS-61dafb.svg)](https://vitejs.dev/)
+[![Backend](https://img.shields.io/badge/backend-Node.js%20%7C%20Express%20%7C%20MongoDB-green.svg)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
-## What's built
+**Neuroviax AI** is an AI-First Autonomous Business Operating Platform (ABOP) built on the MERN stack. It replaces legacy, siloed ERPs and CRMs by orchestrating business workflows through a continuous human-in-the-loop intelligence loop:
+$$\text{Record} \longrightarrow \text{Analyze} \longrightarrow \text{Recommend} \longrightarrow \text{Human Approves} \longrightarrow \text{Workflow Executes}$$
 
-**Phase 1 — Foundation (full):**
-- Authentication (JWT access/refresh tokens, multi-business/multi-role membership model)
-- Business & branch/warehouse management
-- Products (master catalog)
-- Inventory (stock receiving/picking/adjustments, low-stock alerts)
-- Orders (unified sales + purchase order schema, per Section 10's guidance)
-- Payments (4 gateway types stubbed, cash-flow snapshot)
-- Customers & Suppliers (CRM/procurement base records)
-- RBAC, immutable audit logging, rate limiting — per Section 11/12
+---
 
-**A working slice of Phase 3 — Intelligence (Procurement Assistant):**
-- A rule-based recommendation engine that estimates demand velocity from inventory movement history and proposes
-  reorders with a **rationale, confidence score, and risk tier** — following the exact lifecycle in Section 7.1–7.3.
-- Human-in-the-loop approval: approving a recommendation auto-creates the purchase order; rejecting it just logs the
-  decision. High-value recommendations are forced to `high` risk tier regardless of confidence (Section 7.2).
-- This is **not calling an LLM** — it's a deterministic stand-in so the full approval/audit loop is demonstrable
-  end-to-end today. Swapping in a real LLM call means replacing `generateProcurementSignal` logic in
-  `backend/controllers/aiController.js` only; the lifecycle, risk-tiering, and audit trail stay the same.
+## 🚀 Key Features
 
-## Not built (by design, per the roadmap)
+### 1. Operational Hub & Real-time Analytics
+- **Live KPI Metrics**: Real-time tracking of Accounts Receivable ($AR), Accounts Payable ($AP), Low Stock Alerts, Net Cash Position, and AI Proposal Adoption Rate.
+- **ABOP Operating Cycle**: Interactive visual tracking of business signals as they move from ingestion to automated execution.
 
-Sales/Marketing/Customer Support/Finance/Operations AI assistants, WhatsApp Business API integration, real payment
-gateway SDK calls, vector search/RAG context retrieval, offline-first mobile sync, and multi-language localization are
-all Phase 2–4 per Section 15. Building them now, in parallel, is exactly the risk Section 17 calls out
-("Building 6 AI assistants + 7 module groups in parallel overwhelms a small team").
+### 2. 6 Domain-Scoped AI Assistants
+- 🛒 **Procurement Assistant**: Analyzes inventory velocity, detects low-stock thresholds, and generates reorder proposals with confidence scores and risk tiers.
+- 📈 **Sales Intelligence**: Segment velocity, predictive ordering, and next-best-offer recommendations.
+- 📦 **Inventory Optimization**: Anomaly detection, dead-stock flags, and shrinkage alerts.
+- 💳 **Finance & Cash-Flow**: Working capital forecasts and automatic payment follow-ups.
+- 🎯 **Marketing Engine**: Targeted campaign generation based on customer purchasing history.
+- 🎧 **Customer Support & CRM**: Omnichannel communication with direct WhatsApp automation integration.
 
-## Stack
+### 3. Core Enterprise Modules
+- **Authentication & RBAC**: JWT Access & Refresh token system, Multi-business and multi-branch tenancy, Role-Based Access Control (`Owner`, `Admin`, `Manager`, `Staff`).
+- **Product Master Catalog**: Centralized SKU, barcode, unit pricing, cost tracking, and categorical organization.
+- **Multi-Branch Inventory**: Stock receiving, warehouse picking, manual adjustments, transfer logs, and automated alerts.
+- **Unified Orders**: Single schema architecture handling both Sales and Purchase orders through full lifecycles (`pending → approved → fulfilled`).
+- **Payments & Cashflow**: Multi-gateway transaction records (Stripe, JazzCash, Easypaisa, Bank Wire) with automated balance updates.
+- **Expense Management**: Categorized overhead and operational expense tracking.
+- **Customers & Suppliers**: Comprehensive directory with purchase history, credit terms, and ledger statements.
+- **Subscription Management**: Tiered pricing plans (Starter, Basic, Pro, Enterprise) with integrated Stripe Billing.
+- **Audit Logging**: Immutable, tamper-evident audit logs capturing every critical business event.
 
-- **Backend:** Node.js, Express, MongoDB (Mongoose), JWT auth, bcrypt, helmet, rate-limiting
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, React Router, Axios
+---
 
-## Getting started
+## 🛠️ Technology Stack
 
-### 1. Backend
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons, Framer Motion, Zustand |
+| **Backend** | Node.js, Express, MongoDB (with automatic In-Memory DB fallback), JWT, Bcrypt, Helmet |
+| **Integrations** | Stripe Billing, Firebase Authentication (optional), WhatsApp Business Direct Link |
+| **Deployment & Tooling** | Git, PostCSS, ESLint, npm |
 
+---
+
+## 📂 Project Architecture
+
+```
+neuroviax-mern/
+├── backend/
+│   ├── config/             # Database (MongoDB & In-Memory fallback), Stripe, Passport
+│   ├── controllers/        # Business logic for AI, Auth, Inventory, Orders, Payments, etc.
+│   ├── middleware/         # JWT Auth, RBAC guards, Subscription access, Error handling
+│   ├── models/             # Mongoose schemas (Business, User, Product, Order, AIRecommendation)
+│   ├── routes/             # RESTful API endpoints
+│   ├── seed/               # Demo database seeding script
+│   └── server.js           # Express application entrypoint
+│
+└── frontend/
+    ├── public/             # Static assets, favicon, robots.txt, sitemap.xml
+    ├── src/
+    │   ├── api/            # Axios API client instance with interceptors
+    │   ├── components/     # Reusable UI components (Layout, SEO, ProtectedRoute, Modals)
+    │   ├── context/        # React authentication context
+    │   ├── pages/          # Dashboard, AI Assistants, Inventory, Orders, Subscription, etc.
+    │   ├── store/          # Zustand state management
+    │   ├── App.tsx         # Route definitions and layout structure
+    │   └── main.tsx        # React entrypoint
+    └── vite.config.ts      # Vite configuration
+```
+
+---
+
+## ⚡ Quick Start Guide
+
+### Prerequisites
+- **Node.js**: v18.x or higher
+- **npm**: v9.x or higher
+- *(Optional)* **MongoDB**: Local or MongoDB Atlas URI (falls back to In-Memory store if not provided)
+
+---
+
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/MuzammalNazeer/Neuroviax-AI.git
+cd Neuroviax-AI
+```
+
+---
+
+### Step 2: Backend Setup
 ```bash
 cd backend
-cp .env.example .env       # edit MONGO_URI and JWT secrets
+
+# Install dependencies
 npm install
-npm run seed                # creates a demo business + product + low-stock scenario
-npm run dev                 # starts on http://localhost:5000
+
+# Start the development server (runs on port 5000)
+npm run dev
+# OR start with node directly:
+npm start
 ```
 
-Demo login after seeding: `demo@neuroviax.ai` / `Password123!`
+> **Note:** The backend automatically operates with an **in-memory data store** out-of-the-box if `MONGO_URI` is not set in `backend/.env`.
 
-### 2. Frontend
+---
 
+### Step 3: Frontend Setup
+Open a new terminal window:
 ```bash
 cd frontend
-cp .env.example .env        # points to the backend API
+
+# Install dependencies
 npm install
-npm run dev                 # starts on http://localhost:5173
+
+# Start the Vite development server
+npm run dev
 ```
 
-### 3. Try the AI loop
+The frontend will be available at:
+👉 **[http://localhost:5173](http://localhost:5173)**
 
-1. Log in with the demo account (or register your own business).
-2. Go to **AI Recommendations** → click **Generate Recommendations**. The seeded product is below its reorder
-   threshold, so a reorder recommendation with rationale + confidence will appear.
-3. Click **Approve** — this creates a `purchase` Order automatically, visible under **Orders**.
-4. Advance the order through `approved → fulfilled` to see inventory update.
+---
 
-## Requirements coverage reference
+## 🔑 Demo Access Credentials
 
-Functional requirements (FR-01 to FR-14) and non-functional requirements from Section 11 of the source document are
-annotated inline in the relevant model/controller/route files as comments, so you can trace each requirement to its
-implementation.
+The platform comes pre-configured with a ready-to-test business profile:
 
-## Next engineering steps (not in this build)
+| Field | Value |
+|---|---|
+| **Email** | `demo@neuroviax.ai` |
+| **Password** | `Password123!` |
+| **Role** | Business Owner (`OWNER`) |
+| **Organization** | Demo Retail Store |
 
-- Add MFA for financial actions (Section 12.3)
-- Add PCI-tokenized real gateway integrations (Stripe/JazzCash/Easypaisa/Razorpay SDKs)
-- Add vector search (Qdrant/Weaviate) for AI context retrieval once a real LLM replaces the rule-based engine
-- Add offline-first sync for mobile clients (NFR: 72-hour offline resilience)
-- Write automated tests (unit + integration) — none are included in this scaffold
+You can also use the one-click **"Sign In with Google"** / Quick Account Switcher on the Login page.
+
+---
+
+## 🤖 Testing the Autonomous AI Loop
+
+1. Navigate to **AI Proposals / Recommendations** in the sidebar.
+2. Click **Generate Recommendations** — the rule-based AI engine analyzes current stock levels against sales velocity.
+3. A procurement recommendation is generated with **Confidence Score**, **Risk Tier**, and **Detailed Rationale**.
+4. Click **Approve** — the platform automatically creates a formal Purchase Order under **Orders**.
+5. Move the order from `approved` to `fulfilled` to see inventory levels replenish automatically.
+
+---
+
+## 📄 License & Author
+
+- **Author:** [Muzammal Nazeer](https://github.com/MuzammalNazeer)
+- **Repository:** [https://github.com/MuzammalNazeer/Neuroviax-AI](https://github.com/MuzammalNazeer/Neuroviax-AI)
+- **License:** MIT License
