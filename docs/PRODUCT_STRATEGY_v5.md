@@ -1,4 +1,4 @@
-# Neuroviax AI — Consolidated Product & Strategy Documentation (v5.0)
+# Neuroviax AI — Consolidated Product & Strategy Documentation
 
 **Confidential — Founder & Investor Draft**  
 **Category:** Autonomous Business Operating Platform (ABOP)  

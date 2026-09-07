@@ -142,9 +142,6 @@ const Layout: React.FC = () => {
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <h1 className="text-base font-black font-display tracking-tight text-white">Neuroviax AI</h1>
-                <span className="bg-emerald-400/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                  v5.0
-                </span>
               </div>
               <p className="text-[10px] text-emerald-300/70 mt-0.5 leading-tight">AI-First Autonomous Business Operating Platform</p>
             </div>
@@ -395,7 +392,7 @@ const Layout: React.FC = () => {
             {/* ABOP engine badge */}
             <div className="hidden lg:flex items-center gap-1.5 bg-purple-50 border border-purple-200/60 rounded-full px-2.5 py-1">
               <Bot className="w-3 h-3 text-purple-600" />
-              <span className="text-[10px] text-purple-700 font-bold">ABOP v5.0</span>
+              <span className="text-[10px] text-purple-700 font-bold">ABOP Engine</span>
             </div>
 
             {/* Direct WhatsApp Support */}

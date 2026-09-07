@@ -1,4 +1,4 @@
-# Neuroviax AI — Autonomous Business Operating Platform (ABOP v5.0)
+# Neuroviax AI — Autonomous Business Operating Platform (ABOP)
 
 [![Category](https://img.shields.io/badge/Category-Autonomous%20Business%20Operating%20Platform%20(ABOP)-0d9488.svg)](https://github.com/MuzammalNazeer/Neuroviax-AI)
 [![Stack](https://img.shields.io/badge/Stack-MERN%20%2B%20TypeScript%20%2B%20TailwindCSS-3b82f6.svg)](https://github.com/MuzammalNazeer/Neuroviax-AI)

@@ -40,7 +40,7 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 350, damping: 25 } },
 };
 
-// 6 AI Assistants from Section 7 of the v5.0 doc
+// 6 AI Assistants from Section 7 of the product document
 const AI_ASSISTANTS = [
   {
     name: 'Sales',
@@ -221,7 +221,7 @@ const Dashboard: React.FC = () => {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-emerald-800/50 border border-emerald-500/30 rounded-full px-3 py-1 text-xs font-bold text-emerald-200 mb-4 backdrop-blur-sm">
               <Zap className="w-3.5 h-3.5 text-amber-300" />
-              <span>AI-First Autonomous Business Operating Platform · v5.0</span>
+              <span>AI-First Autonomous Business Operating Platform</span>
             </div>
             <h2 className="text-3xl font-black font-display tracking-tight text-white mb-2">
               Neuroviax Operational Hub

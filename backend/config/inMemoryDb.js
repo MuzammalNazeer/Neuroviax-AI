@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// Import all models (11 core + 5 new v5.0 modules)
+// Import all models (11 core + 5 extended modules)
 const User = require('../models/User');
 const Business = require('../models/Business');
 const Branch = require('../models/Branch');

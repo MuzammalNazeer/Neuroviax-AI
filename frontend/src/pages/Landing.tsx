@@ -275,7 +275,6 @@ const Landing: React.FC = () => {
             </div>
             <div>
               <span className="text-sm font-black font-display tracking-tight text-white">Neuroviax AI</span>
-              <span className="ml-2 bg-emerald-400/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">v5.0</span>
             </div>
           </div>
           <div className="hidden md:flex items-center gap-6 text-xs text-slate-400 font-medium">
@@ -1052,7 +1051,7 @@ const Landing: React.FC = () => {
               <Sparkles className="w-3 h-3 text-emerald-950" />
             </div>
             <span className="text-xs font-black text-slate-400">Neuroviax AI</span>
-            <span className="text-[10px] text-slate-600">v5.0 — ABOP</span>
+            <span className="text-[10px] text-slate-600">ABOP Platform</span>
           </div>
           <p className="text-[11px] text-slate-600">
             AI-First · SME-Focused · Emerging Markets · Pakistan · India · MENA

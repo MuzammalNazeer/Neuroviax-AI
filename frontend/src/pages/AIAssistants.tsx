@@ -200,8 +200,7 @@ const AIAssistants: React.FC = () => {
           </h2>
           <p className="text-slate-500 text-xs mt-1.5 max-w-2xl leading-relaxed">
             Six specialized, domain-scoped AI assistants — each operating over a constrained data domain for accuracy,
-            auditability, and granular permissioning. Every recommendation is risk-tiered and explainable.{' '}
-            <span className="text-purple-600 font-semibold">§7 of the v5.0 Product Document.</span>
+            auditability, and granular permissioning. Every recommendation is risk-tiered and explainable.
           </p>
         </div>
         <Link to="/recommendations">

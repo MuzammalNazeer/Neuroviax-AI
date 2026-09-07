@@ -278,7 +278,7 @@ const Login: React.FC = () => {
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>ABOP Engine v5.0 • Autonomous Operations</span>
+              <span>ABOP Engine • Autonomous Operations</span>
             </div>
 
             <h1 className="text-4xl xl:text-5xl font-black font-display tracking-tight text-white leading-tight">
@@ -827,8 +827,6 @@ const Login: React.FC = () => {
       <div className="fixed bottom-4 right-4 hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 backdrop-blur-md text-[11px] text-slate-400 shadow-xl z-20">
         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         <span>Neuroviax Cloud: Operational</span>
-        <span className="text-slate-600">|</span>
-        <span className="text-emerald-400 font-mono">v5.0</span>
       </div>
     </div>
   );
