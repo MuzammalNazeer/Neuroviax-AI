@@ -49,6 +49,22 @@
 
 ---
 
+## 🧭 Public Web Architecture & Dedicated Pages
+
+Every core marketing and architectural pillar is implemented as an independent, fully-featured page equipped with the shared **`LandingNavbar`** (active route indicator & mobile menu) and **`LandingFooter`**:
+
+| Page / Route | Component | Key Highlights |
+| :--- | :--- | :--- |
+| **`6 AI Assistants`** (`/assistants`) | `AIAssistantsPage.tsx` | Interactive sandbox simulating live signals across Sales, Procurement, Inventory, Marketing, Support, and Finance. |
+| **`ABOP Loop`** (`/abop-loop`) | `ABOPLoopPage.tsx` | 5-stage closed loop explorer (*Record → Analyze → Recommend → Approve → Execute*) with live event stream. |
+| **`30/70 Differentiator`** (`/differentiator`) | `DifferentiatorPage.tsx` | Strategic moat breakdown and competitive matrix against Tally, Zoho One, Odoo, and SAP. |
+| **`Pricing`** (`/pricing`) | `PricingPage.tsx` | Multi-currency (PKR ₨ / USD $) pricing tiers (Free Starter, Growth, Professional 100% ABOP, Enterprise Franchise). |
+| **`FAQ`** (`/faq`) | `FAQPage.tsx` | Searchable knowledge base with categorized interactive accordions covering safety, WhatsApp, and data security. |
+| **`About`** (`/about`) | `About.tsx` | Platform mission, core values, evolution roadmap, and leadership architecture. |
+| **`Contact`** (`/contact`) | `Contact.tsx` | 24/7 ticket routing, SLA response commitment, and direct WhatsApp channel. |
+
+---
+
 ## ✨ Core Features & Modules
 
 ### 1. 🔐 Authentication & Identity
@@ -110,10 +126,20 @@ neuroviax-mern/
 ├── frontend/                             # React 18 + Vite + TypeScript
 │   ├── src/
 │   │   ├── api/                          # Axios API client
-│   │   ├── components/                   # Navigation, Layout, ProtectedRoute, SubscriptionGate
+│   │   ├── components/                   # LandingNavbar, LandingFooter, ProtectedRoute, Layout
 │   │   ├── context/                      # AuthContext & state providers
 │   │   ├── hooks/                        # Custom React hooks (e.g., SEO metadata)
-│   │   ├── pages/                        # 27+ Page components (Dashboard, POS, AI, Admin, etc.)
+│   │   ├── pages/                        # 30+ Page components:
+│   │   │   ├── AIAssistantsPage.tsx      # /assistants — 6 AI Copilots Showcase
+│   │   │   ├── ABOPLoopPage.tsx          # /abop-loop — 5-Stage Closed Loop
+│   │   │   ├── DifferentiatorPage.tsx    # /differentiator — 30/70 Moat Breakdown
+│   │   │   ├── PricingPage.tsx           # /pricing — Transparent PKR/USD Tiers
+│   │   │   ├── FAQPage.tsx               # /faq — Searchable Knowledge Base
+│   │   │   ├── About.tsx                 # /about — Architecture & Leadership
+│   │   │   ├── Contact.tsx               # /contact — 24/7 Support & WhatsApp
+│   │   │   ├── Dashboard.tsx             # Protected ERP Command Center
+│   │   │   ├── AdminDashboard.tsx        # Super Admin Cockpit
+│   │   │   └── ... (POS, Products, Inventory, Orders, Payments, Reports)
 │   │   ├── store/                        # Zustand state stores
 │   │   ├── App.tsx                       # React application router
 │   │   └── main.tsx                      # Frontend entry point
