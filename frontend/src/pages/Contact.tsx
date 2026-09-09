@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuthStore } from '../store/useAuthStore';
+import api from '../api/axios';
 
 const FAQ_ITEMS = [
   {
@@ -52,18 +53,26 @@ const Contact: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [ticketId, setTicketId] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
-    // Simulate reliable ticket creation
-    setTimeout(() => {
-      setLoading(false);
-      const generatedId = `NVX-${Math.floor(100000 + Math.random() * 900000)}`;
+    try {
+      const res = await api.post('/contact', formData);
+      const generatedId = res.data?.ticketId || `NVX-${Math.floor(100000 + Math.random() * 900000)}`;
       setTicketId(generatedId);
       setSubmitted(true);
-    }, 900);
+    } catch (err: any) {
+      console.error('Contact form submission error:', err);
+      setError(
+        err.response?.data?.message || 'Unable to submit ticket at this moment. Please reach us via WhatsApp directly.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -271,6 +280,12 @@ const Contact: React.FC = () => {
                       />
                     </div>
 
+                    {error && (
+                      <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-400 flex items-center gap-2">
+                        <span>⚠️ {error}</span>
+                      </div>
+                    )}
+
                     <button
                       type="submit"
                       disabled={loading}
@@ -325,9 +340,15 @@ const Contact: React.FC = () => {
                       Thank you for contacting Neuroviax AI. Your ticket has been logged in our priority queue with reference{' '}
                       <strong className="text-emerald-400 font-mono">{ticketId}</strong>.
                     </p>
-                    <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 max-w-sm mx-auto text-xs text-slate-400">
-                      A copy has been routed to our operations lead. You will receive an email confirmation at{' '}
-                      <span className="text-white font-medium">{formData.email}</span>.
+                    <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 max-w-md mx-auto text-xs text-slate-300 space-y-1 text-left">
+                      <p className="text-emerald-400 font-semibold flex items-center gap-1.5">
+                        <span>✉️ Real-Time Notification Sent</span>
+                      </p>
+                      <p className="text-slate-400">
+                        An instant notification with your details has been dispatched to{' '}
+                        <span className="text-white font-medium">nazirmuzammal28@gmail.com</span> and a confirmation receipt has been sent to{' '}
+                        <span className="text-white font-medium">{formData.email}</span>.
+                      </p>
                     </div>
 
                     <div className="pt-4 flex justify-center gap-3">

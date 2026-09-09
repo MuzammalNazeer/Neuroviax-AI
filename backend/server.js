@@ -33,6 +33,7 @@ const integrationRoutes = require('./routes/integrationRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 const app = express();
 
@@ -68,6 +69,16 @@ app.use(passport.initialize()); // Required for Google OAuth strategy
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300 });
 app.use('/api', apiLimiter);
 
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Neuroviax API',
+    status: 'running',
+    version: '1.0.0',
+    message: 'Backend server is running successfully.',
+    health: '/api/health'
+  });
+});
+
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
 app.use('/api/auth', authRoutes);
@@ -85,6 +96,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

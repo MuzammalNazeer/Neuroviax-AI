@@ -97,7 +97,7 @@ const Login: React.FC = () => {
         localStorage.removeItem('rememberMe');
       }
       await login(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid credentials or login failed');
     }
@@ -129,7 +129,7 @@ const Login: React.FC = () => {
 
           setSuccess(`Authenticated as ${fbUser.displayName || fbUser.email}! Redirecting…`);
           setTimeout(() => {
-            navigate('/');
+            navigate('/dashboard');
           }, 350);
           return;
         } catch (err: any) {
@@ -166,7 +166,7 @@ const Login: React.FC = () => {
       });
       setSuccess(`Enterprise SSO authenticated! Redirecting…`);
       setTimeout(() => {
-        navigate('/');
+        navigate('/dashboard');
       }, 300);
     } catch (err: any) {
       setError(err.response?.data?.message || `${provider} SSO authentication failed.`);
@@ -190,7 +190,7 @@ const Login: React.FC = () => {
       });
       setSuccess(`Signed in as ${fbUser.displayName || fbUser.email} via Google!`);
       setShowGoogleModal(false);
-      setTimeout(() => navigate('/'), 350);
+      setTimeout(() => navigate('/dashboard'), 350);
     } catch (err: any) {
       console.error('Firebase error:', err);
       if (err.code === 'auth/popup-closed-by-user') {
@@ -215,7 +215,7 @@ const Login: React.FC = () => {
       setSuccess(`Signed in as ${account.name} (${account.email}) via Google!`);
       setShowGoogleModal(false);
       setTimeout(() => {
-        navigate('/');
+        navigate('/dashboard');
       }, 350);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Google Sign-In failed. Please try again.');

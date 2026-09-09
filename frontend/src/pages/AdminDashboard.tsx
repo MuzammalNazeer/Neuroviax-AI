@@ -220,13 +220,36 @@ const AdminDashboard: React.FC = () => {
       };
 
       // Step 2: Fetch all real data in parallel
-      const [statsRes, usersRes, logsRes, cockpitRes, twinRes] = await Promise.all([
+      let [statsRes, usersRes, logsRes, cockpitRes, twinRes] = await Promise.all([
         axios.get(`${API_BASE_URL}/admin/stats`, activeHeaders).catch(() => ({ data: null })),
         axios.get(`${API_BASE_URL}/admin/users`, activeHeaders).catch(() => ({ data: [] })),
         axios.get(`${API_BASE_URL}/admin/audit-logs`, activeHeaders).catch(() => ({ data: [] })),
         axios.get(`${API_BASE_URL}/admin/cockpit`, activeHeaders).catch(() => ({ data: null })),
         axios.get(`${API_BASE_URL}/admin/business-twin`, activeHeaders).catch(() => ({ data: null })),
       ]);
+
+      if (!statsRes.data) {
+        try {
+          const sessionRes = await axios.get(`${API_BASE_URL}/admin/session`);
+          if (sessionRes.data?.accessToken) {
+            token = String(sessionRes.data.accessToken);
+            setTokens(token);
+            if (sessionRes.data.user) {
+              setUser(sessionRes.data.user);
+            }
+            const freshHeaders = { headers: { Authorization: `Bearer ${token}` } };
+            [statsRes, usersRes, logsRes, cockpitRes, twinRes] = await Promise.all([
+              axios.get(`${API_BASE_URL}/admin/stats`, freshHeaders).catch(() => ({ data: null })),
+              axios.get(`${API_BASE_URL}/admin/users`, freshHeaders).catch(() => ({ data: [] })),
+              axios.get(`${API_BASE_URL}/admin/audit-logs`, freshHeaders).catch(() => ({ data: [] })),
+              axios.get(`${API_BASE_URL}/admin/cockpit`, freshHeaders).catch(() => ({ data: null })),
+              axios.get(`${API_BASE_URL}/admin/business-twin`, freshHeaders).catch(() => ({ data: null })),
+            ]);
+          }
+        } catch (e) {
+          // fallback
+        }
+      }
 
       if (statsRes.data) setStats(statsRes.data);
       if (Array.isArray(usersRes.data)) setUsers(usersRes.data);

@@ -1,48 +1,62 @@
 # Neuroviax AI — MERN Stack Implementation
 
-**Neuroviax AI** is a full-stack, multi-business ERP + AI platform for small & medium enterprises. This repository contains a working **MERN (MongoDB, Express, React, Node.js)** implementation covering **Phase 1 (Foundation)** in full, plus a working slice of **Phase 3 (Intelligence)** — the rule-based Procurement Assistant.
-
-> The build intentionally follows the scope guidance in the *Neuroviax AI Consolidated Product & Strategy Document v5.0*: implement Phase 1 completely + a demonstrable slice of Phase 3, rather than attempting all 7 modules and 6 AI assistants at once (which is flagged as the top risk in Section 17).
+**Neuroviax AI** is a full-stack, enterprise-grade multi-business ERP + AI platform designed for small & medium enterprises. This repository contains a production-ready **MERN (MongoDB, Express, React, Node.js)** implementation covering **Phase 1 (Foundation)** in full, plus an intelligent **Procurement & Demand Forecasting Assistant (Phase 3)** and a **Super Admin Cockpit** for platform governance.
 
 ---
 
-## ✨ Features
+## ✨ Core Features & Modules
 
-### Phase 1 — Foundation (complete)
-- **Authentication** — JWT access/refresh tokens, multi-business / multi-role membership model
-- **Google OAuth 2.0 SSO** — real Passport flow when credentials are configured, with a polished **dev fallback account-chooser** when they are not
-- **Firebase ID-token SSO login**
-- **Password reset via OTP** — emailed 6-digit code, hashed & stored, with a 10-minute expiry
-- **Business & Branch management** — multi-branch / multi-warehouse support
-- **Team & RBAC** — owner / admin / manager / staff / accountant roles
-- **Products** — master catalog with SKU, cost/sell price, reorder threshold
-- **Inventory** — stock receiving / picking / adjustments, movement history, low-stock alerts
-- **Orders** — unified sales + purchase order schema
-- **Payments** — 4 gateway types stubbed, cash-flow snapshot, Stripe checkout
-- **Customers & Suppliers** — CRM / procurement base records, supplier comparison
-- **Expenses** — categorized, per-branch expense tracking + summary
-- **Notifications** — in-app + channel notifications
-- **Reports** — live reports + saved snapshots
-- **Integrations** — WhatsApp, JazzCash, Easypaisa, Stripe, Razorpay connectors (stubbed)
-- **Subscriptions** — Stripe billing (FREE / BASIC / PRO) with checkout, cancel, reactivate, portal, and admin analytics
-- **Security** — RBAC, immutable audit logging, rate limiting, helmet
+### 1. 🔐 Authentication & Identity
+- **JWT Authentication** — Secure access and refresh token lifecycle.
+- **Google OAuth 2.0 SSO** — Real Passport flow when Google OAuth credentials are provided, with an automatic account picker fallback for local testing.
+- **Firebase ID Token SSO** — Firebase token verification for web and mobile clients.
+- **Password Reset via OTP** — 6-digit email verification code with SHA-256 hashing and a 10-minute expiry window.
+- **Multi-Tenant / Role-Based Access Control (RBAC)** — Roles: `owner`, `admin`, `manager`, `staff`, `accountant`.
 
-### Phase 3 — Intelligence (Procurement Assistant slice)
-- A **rule-based recommendation engine** that estimates demand velocity from inventory movement history and proposes reorders with a **rationale, confidence score, and risk tier**
-- **Human-in-the-loop approval** — approving a recommendation auto-creates a `purchase` order; rejecting just logs the decision
-- High-value recommendations are forced to `high` risk tier regardless of confidence
-- This is **not calling an LLM** — it's a deterministic stand-in so the full approval/audit loop is demonstrable end-to-end. Swapping in a real LLM means replacing `generateProcurementSignal` in `backend/controllers/aiController.js` only; the lifecycle, risk-tiering, and audit trail stay the same.
+### 2. 🏢 Business & Multi-Branch Management
+- Multi-business context with currency, industry, and fiscal configuration.
+- Multi-branch and warehouse inventory tracking.
+- Team member invitations with role assignments and active/inactive toggles.
+
+### 3. 📦 Products & Inventory Management
+- **Product Master Catalog** — SKU, category, barcode, cost/sell price, and reorder thresholds.
+- **Inventory Movements** — Comprehensive audit logging for stock `in`, `out`, and `adjustment`.
+- **Automated Low-Stock Alerts** — Instant triggers when inventory drops below safety thresholds.
+
+### 4. 🛒 Point of Sale (POS) & Order Management
+- Unified Sales and Purchase order management.
+- Real-time cart calculations with tax, discount, and inventory deduction.
+- Order lifecycle states: `pending`, `processing`, `completed`, `cancelled`.
+
+### 5. 💳 Payments & Gateway Integrations
+- Gateway support for **Stripe**, **JazzCash**, **Easypaisa**, **Razorpay**, **Bank Transfer**, and **Cash**.
+- Cash flow analytics snapshot and real-time revenue aggregation.
+- Account verification gating for secure transactions.
+
+### 6. 🤖 AI Intelligence & ML Demand Forecasting
+- **Demand Velocity Forecasting** — Time-series forecast of product sales and stock depletion risk.
+- **Rule-based Procurement Assistant** — Autonomous reorder suggestions with confidence ratings and risk tiers (`low`, `medium`, `high`).
+- **Human-in-the-Loop Decisions** — One-click approval auto-generates purchase orders.
+
+### 7. 📊 Reports & Financial Analytics
+- Live report generators for Sales, Inventory, Profit & Loss, and Tax.
+- Categorized expense tracking and monthly spending breakdowns.
+
+### 8. 🛡️ Super Admin Cockpit (Muzammal Nazir)
+- Global enterprise telemetry and live system health monitoring.
+- Digital Twin real-time enterprise metrics.
+- User management and platform-wide audit log inspection.
 
 ---
 
 ## 🧱 Tech Stack
 
-| Layer    | Technology |
-|----------|-----------|
-| **Backend**  | Node.js, Express, MongoDB (Mongoose), JWT auth, bcrypt, passport (Google OAuth 2.0), Stripe, Nodemailer, Firebase Admin, helmet, express-rate-limit |
-| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, React Router, Axios, Zustand, Framer Motion, Lucide React, Canvas Confetti |
-| **Auth**     | JWT (access + refresh), Google OAuth (real + dev fallback), Firebase ID tokens |
-| **Payments** | Stripe (subscription billing + checkout + webhooks) |
+| Layer | Technology |
+| :--- | :--- |
+| **Backend API** | Node.js, Express.js, MongoDB (Mongoose), JWT, Bcrypt, Passport.js, Stripe, Nodemailer, Firebase Admin, Helmet, Express-Rate-Limit, Morgan |
+| **Frontend App** | React 18, TypeScript, Vite, Tailwind CSS, Zustand, React Router, Axios, Framer Motion, Lucide Icons, Canvas Confetti |
+| **Database** | MongoDB Atlas / Local MongoDB (with In-Memory fallback for zero-config offline runs) |
+| **Testing & API** | Postman Collection v2.1 (`Neuroviax_API.postman_collection.json`) |
 
 ---
 
@@ -50,67 +64,127 @@
 
 ```
 neuroviax-mern/
-├── backend/                 # Node.js/Express API
-│   ├── config/              # db, passport, stripe, in-memory DB
-│   ├── controllers/         # route handlers (15 modules)
-│   ├── middleware/          # auth, RBAC, error handler, subscription access
-│   ├── models/              # Mongoose schemas (17 models)
-│   ├── routes/              # API route definitions
-│   ├── seed/                # demo data seeder
-│   ├── utils/               # asyncHandler, audit, generateToken, sendEmail
-│   └── server.js            # entry point
-├── frontend/                # React 18 + Vite + TS
+├── backend/                              # Express & Node.js REST API
+│   ├── config/                           # Database, Passport, and Stripe configurations
+│   ├── controllers/                      # Business logic controllers (16 modules)
+│   ├── middleware/                       # Auth, RBAC, Super Admin, Error Handlers
+│   ├── models/                           # Mongoose data schemas (17 models)
+│   ├── routes/                           # API route definitions
+│   ├── seed/                             # Database seed scripts
+│   ├── utils/                            # Email, tokens, and audit helpers
+│   └── server.js                         # Backend entry point
+├── frontend/                             # React 18 + Vite + TypeScript
 │   ├── src/
-│   │   ├── api/             # axios client
-│   │   ├── components/      # Layout, ProtectedRoute, SubscriptionGate, etc.
-│   │   ├── context/         # AuthContext
-│   │   ├── hooks/           # usePageSEO
-│   │   ├── pages/           # 27 page components
-│   │   ├── store/           # Zustand auth store
-│   │   ├── App.tsx          # router
-│   │   └── main.tsx         # entry point
-│   └── vite.config.ts
-├── docs/                    # Product strategy docs
-└── README.md
+│   │   ├── api/                          # Axios API client
+│   │   ├── components/                   # Navigation, Layout, ProtectedRoute, SubscriptionGate
+│   │   ├── context/                      # AuthContext & state providers
+│   │   ├── hooks/                        # Custom React hooks (e.g., SEO metadata)
+│   │   ├── pages/                        # 27+ Page components (Dashboard, POS, AI, Admin, etc.)
+│   │   ├── store/                        # Zustand state stores
+│   │   ├── App.tsx                       # React application router
+│   │   └── main.tsx                      # Frontend entry point
+│   └── vite.config.ts                    # Vite config with API proxy
+├── Neuroviax_API.postman_collection.json # Importable Postman collection for all endpoints
+└── README.md                             # Project documentation
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-- **Node.js** v18+ (verified on v24)
-- **npm** v9+
-- Optional: **MongoDB** running locally (`mongodb://127.0.0.1:27017`) — if unavailable, the backend **automatically falls back to an in-memory demo database** with pre-seeded data
+- **Node.js** v18 or higher
+- **npm** v9 or higher
+- Optional: **MongoDB** running locally or a MongoDB Atlas URI (if omitted, falls back to an in-memory DB)
+
+---
 
 ### 1. Backend Setup
 
 ```bash
 cd backend
-cp .env.example .env        # then edit values (see Environment Variables below)
+
+# Install dependencies
 npm install
-npm run seed                 # optional: seed demo data for MongoDB mode
-npm run dev                  # starts on http://localhost:5000 (nodemon)
-# or
-npm start                    # plain node server.js
+
+# Setup environment file
+cp .env.example .env
+
+# (Optional) Seed the database with sample business data
+npm run seed
+
+# Start development server (Port 5000)
+npm run dev
 ```
+
+The backend will be live at `http://localhost:5000`.
+
+---
 
 ### 2. Frontend Setup
 
 ```bash
 cd frontend
-cp .env.example .env         # points to the backend API
+
+# Install dependencies
 npm install
-npm run dev                  # starts on http://localhost:5173
+
+# Setup environment file
+cp .env.example .env
+
+# Start development server (Port 5173)
+npm run dev
 ```
 
-### 3. Open in Browser
-
-```bash
-# Frontend
-open http://localhost:5173
-```
-
-> The frontend dev server proxies `/api/*` to `http://localhost:5000` (see `frontend/vite.config.ts`).
+Open your browser and navigate to `http://localhost:5173`.
 
 ---
+
+## 📮 Postman API Testing
+
+An importable Postman Collection is included in the root directory:
+👉 **[`Neuroviax_API.postman_collection.json`](./Neuroviax_API.postman_collection.json)**
+
+### How to use:
+1. Open **Postman** and click **Import**.
+2. Select `Neuroviax_API.postman_collection.json`.
+3. Run the **`1. Authentication > Login User`** request. The access token is automatically saved into the collection variable `{{token}}`.
+4. Run and test any endpoint across all 11 categories (Products, POS, Inventory, Payments, AI, Admin, etc.).
+
+---
+
+## 🔑 Environment Variables Reference
+
+### Backend (`backend/.env`)
+```env
+PORT=5000
+NODE_ENV=development
+MONGO_URI=mongodb://localhost:27017/neuroviax
+JWT_ACCESS_SECRET=your_jwt_access_secret_key_here
+JWT_REFRESH_SECRET=your_jwt_refresh_secret_key_here
+CLIENT_URL=http://localhost:5173
+
+# Optional: Email Notifications (Nodemailer)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+EMAIL_FROM="Neuroviax AI <noreply@neuroviax.com>"
+
+# Optional: Stripe & OAuth
+STRIPE_SECRET_KEY=sk_test_...
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+```
+
+### Frontend (`frontend/.env`)
+```env
+VITE_API_BASE_URL=http://localhost:5000/api
+```
+
+---
+
+## 🛡️ License & Author
+
+- **Platform Creator & Lead Developer**: Muzammal Nazir
+- **Project**: Neuroviax AI — Next-Gen Enterprise ERP & Intelligence Platform

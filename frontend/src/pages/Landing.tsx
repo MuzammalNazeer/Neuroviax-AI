@@ -243,14 +243,8 @@ const PRICING_TIERS = [
 
 const Landing: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [currency, setCurrency] = useState<'PKR' | 'USD'>('PKR');
-
-  // Redirect already-authenticated users straight to dashboard
-  useEffect(() => {
-    if (user) navigate('/', { replace: true });
-  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
@@ -283,20 +277,33 @@ const Landing: React.FC = () => {
             <a href="#comparison" className="hover:text-emerald-400 transition-colors">30/70 Differentiator</a>
             <a href="#pricing" className="hover:text-emerald-400 transition-colors">Pricing</a>
             <a href="#faq" className="hover:text-emerald-400 transition-colors">FAQ</a>
+            <Link to="/about" className="hover:text-emerald-400 transition-colors">About</Link>
+            <Link to="/contact" className="hover:text-emerald-400 transition-colors">Contact</Link>
           </div>
           <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="text-xs text-slate-300 hover:text-white font-semibold transition"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/register"
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-teal-400 transition-all flex items-center gap-1.5"
-            >
-              Get Started <ArrowRight className="w-3 h-3" />
-            </Link>
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-teal-400 transition-all flex items-center gap-1.5"
+              >
+                Go to Dashboard <ArrowRight className="w-3 h-3" />
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-xs text-slate-300 hover:text-white font-semibold transition"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-teal-400 transition-all flex items-center gap-1.5"
+                >
+                  Get Started <ArrowRight className="w-3 h-3" />
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -365,26 +372,53 @@ const Landing: React.FC = () => {
               animate="visible"
               className="flex flex-col sm:flex-row items-center justify-center gap-3"
             >
-              <Link to="/register">
-                <motion.div
-                  whileHover={{ scale: 1.04, y: -1 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm px-7 py-3.5 rounded-2xl shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Launch Your ABOP Workspace
-                  <ArrowRight className="w-4 h-4" />
-                </motion.div>
-              </Link>
-              <Link to="/login">
-                <motion.div
-                  whileHover={{ scale: 1.04, y: -1 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-100 font-bold text-sm px-7 py-3.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  Sign In to Platform
-                </motion.div>
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/dashboard">
+                    <motion.div
+                      whileHover={{ scale: 1.04, y: -1 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm px-7 py-3.5 rounded-2xl shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Open Business Dashboard
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.div>
+                  </Link>
+                  <a href="http://localhost:5175" target="_blank" rel="noreferrer">
+                    <motion.div
+                      whileHover={{ scale: 1.04, y: -1 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-100 font-bold text-sm px-7 py-3.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      Open Admin Portal (5175)
+                    </motion.div>
+                  </a>
+                </>
+              ) : (
+                <>
+                  <Link to="/register">
+                    <motion.div
+                      whileHover={{ scale: 1.04, y: -1 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm px-7 py-3.5 rounded-2xl shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Launch Your ABOP Workspace
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.div>
+                  </Link>
+                  <Link to="/login">
+                    <motion.div
+                      whileHover={{ scale: 1.04, y: -1 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-100 font-bold text-sm px-7 py-3.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      Sign In to Platform
+                    </motion.div>
+                  </Link>
+                </>
+              )}
             </motion.div>
           </div>
 

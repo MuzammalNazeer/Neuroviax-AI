@@ -63,8 +63,16 @@ const App: React.FC = () => {
       <Route path="/admin/login" element={<AdminAuth />} />
       <Route path="/admin/signup" element={<AdminAuth />} />
 
-      {/* Public routes */}
+      {/* Public website routes */}
+      <Route path="/" element={<Landing />} />
       <Route path="/landing" element={<Landing />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+      <Route path="/subscription/success" element={<CheckoutSuccess />} />
+      <Route path="/subscription/cancel" element={<CheckoutCancel />} />
+
+      {/* Public auth routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/signup" element={<Register />} />
@@ -72,46 +80,35 @@ const App: React.FC = () => {
       <Route path="/verify-otp" element={<VerifyOTP />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-      <Route path="/subscription/success" element={<CheckoutSuccess />} />
-      <Route path="/subscription/cancel" element={<CheckoutCancel />} />
 
-      {/* Protected app routes */}
+      {/* Protected ERP app routes */}
       <Route
-        path="/"
         element={
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Dashboard />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="products" element={<Products />} />
-        <Route path="inventory" element={<Inventory />} />
-        <Route path="orders" element={<Orders />} />
-        <Route path="payments" element={<Payments />} />
-        <Route path="expenses" element={<Expenses />} />
-        <Route path="customers" element={<Customers />} />
-        <Route path="suppliers" element={<Suppliers />} />
-        <Route path="reports" element={<Reports />} />
-        <Route path="integrations" element={<Integrations />} />
-        <Route path="subscription" element={<SubscriptionManagement />} />
-        <Route path="subscription/management" element={<SubscriptionManagement />} />
-        <Route path="subscription/plans" element={<SubscriptionPlans />} />
-        <Route path="subscription/success" element={<CheckoutSuccess />} />
-        <Route path="subscription/cancel" element={<CheckoutCancel />} />
-        <Route path="recommendations" element={<Recommendations />} />
-        <Route path="demand-forecasting" element={<DemandForecasting />} />
-        <Route path="ai-assistants" element={<AIAssistants />} />
-        <Route path="team" element={<Team />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/payments" element={<Payments />} />
+        <Route path="/expenses" element={<Expenses />} />
+        <Route path="/customers" element={<Customers />} />
+        <Route path="/suppliers" element={<Suppliers />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/integrations" element={<Integrations />} />
+        <Route path="/subscription" element={<SubscriptionManagement />} />
+        <Route path="/subscription/management" element={<SubscriptionManagement />} />
+        <Route path="/recommendations" element={<Recommendations />} />
+        <Route path="/demand-forecasting" element={<DemandForecasting />} />
+        <Route path="/ai-assistants" element={<AIAssistants />} />
+        <Route path="/team" element={<Team />} />
       </Route>
 
       {/* Fallback route */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

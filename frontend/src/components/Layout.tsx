@@ -42,7 +42,7 @@ import {
 import api from '../api/axios';
 
 const ALL_NAV_ITEMS = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, group: 'core', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'] },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, group: 'core', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'] },
   { to: '/products', label: 'Products', icon: Package, group: 'core', roles: ['owner', 'admin', 'manager', 'staff'] },
   { to: '/inventory', label: 'Inventory', icon: Warehouse, group: 'core', roles: ['owner', 'admin', 'manager', 'staff'] },
   { to: '/orders', label: 'Orders', icon: Receipt, group: 'core', roles: ['owner', 'admin', 'manager', 'staff'] },
@@ -68,8 +68,8 @@ const ROLE_STYLES: Record<string, { label: string; badge: string; icon: React.Co
 };
 
 const TOP_NAVBAR_ITEMS = [
-  { to: '/landing', label: 'Homepage', icon: Home, badge: 'Main' },
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/', label: 'Website', icon: Home, badge: 'Public' },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/about', label: 'About', icon: Info },
   { to: '/subscription/plans', label: 'Pricing & Plans', icon: Crown, badge: 'Stripe' },
   { to: '/contact', label: 'Contact', icon: Mail },
@@ -116,7 +116,7 @@ const Layout: React.FC = () => {
   const RoleIcon = roleStyle.icon;
 
   const businessName = activeMembership?.business?.name || 'Primary Business';
-  const pageLabel = location.pathname === '/' ? 'Dashboard' : location.pathname.slice(1).replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const pageLabel = location.pathname === '/' || location.pathname === '/dashboard' ? 'Dashboard' : location.pathname.slice(1).replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
   const navItems = ALL_NAV_ITEMS.filter((n) => n.roles.includes(currentRole));
   const coreNav = navItems.filter((n) => n.group === 'core');

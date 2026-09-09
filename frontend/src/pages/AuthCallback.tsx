@@ -59,12 +59,12 @@ const AuthCallback: React.FC = () => {
         confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
 
         setTimeout(() => {
-          navigate('/');
+          navigate('/dashboard');
         }, 600);
       } catch (err: any) {
         console.error('Failed to finalize Google auth:', err);
         // Fallback: token was already stored, proceed to dashboard
-        navigate('/');
+        navigate('/dashboard');
       }
     };
 
