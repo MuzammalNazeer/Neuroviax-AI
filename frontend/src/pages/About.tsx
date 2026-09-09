@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import LandingNavbar from '../components/LandingNavbar';
+import LandingFooter from '../components/LandingFooter';
 import {
   Sparkles,
   ShieldCheck,
@@ -72,8 +74,10 @@ const About: React.FC = () => {
         description="Learn about Neuroviax AI's mission, architecture, leadership, security compliance, and commitment to transforming modern businesses with autonomous AI workflows."
       />
 
+      <LandingNavbar />
+
       {/* Hero Section */}
-      <div className="relative pt-20 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="relative pt-32 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Glow Gradients */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/3 right-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -237,7 +241,7 @@ const About: React.FC = () => {
       </div>
 
       {/* Bottom CTA Banner */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
           <div className="space-y-2 text-center sm:text-left">
             <h3 className="text-2xl sm:text-3xl font-black text-white">
@@ -249,21 +253,23 @@ const About: React.FC = () => {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <button
-              onClick={() => navigate('/subscription/plans')}
-              className="px-6 py-3 rounded-xl font-bold text-sm bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition flex items-center gap-2 shadow-lg"
+              onClick={() => navigate('/pricing')}
+              className="px-6 py-3 rounded-xl font-bold text-sm bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition flex items-center gap-2 shadow-lg cursor-pointer"
             >
               <span>View Pricing Plans</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => navigate('/contact')}
-              className="px-6 py-3 rounded-xl font-semibold text-sm bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 transition"
+              className="px-6 py-3 rounded-xl font-semibold text-sm bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 transition cursor-pointer"
             >
               Contact Sales
             </button>
           </div>
         </div>
       </div>
+
+      <LandingFooter />
     </div>
   );
 };

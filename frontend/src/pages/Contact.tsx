@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import LandingNavbar from '../components/LandingNavbar';
+import LandingFooter from '../components/LandingFooter';
 import {
   Mail,
   Phone,
@@ -82,8 +84,10 @@ const Contact: React.FC = () => {
         description="Connect with Neuroviax AI support, enterprise sales, technical specialists, and partnership directors. Guaranteed SLA response times."
       />
 
+      <LandingNavbar />
+
       {/* Header */}
-      <div className="pt-16 pb-12 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto space-y-4">
+      <div className="pt-32 pb-12 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
           <MessageCircle className="w-3.5 h-3.5" />
           Get in Touch
@@ -395,6 +399,8 @@ const Contact: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <LandingFooter />
     </div>
   );
 };

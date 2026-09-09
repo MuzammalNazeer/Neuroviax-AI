@@ -29,6 +29,11 @@ import CheckoutSuccess from './pages/CheckoutSuccess';
 import CheckoutCancel from './pages/CheckoutCancel';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import AIAssistantsPage from './pages/AIAssistantsPage';
+import ABOPLoopPage from './pages/ABOPLoopPage';
+import DifferentiatorPage from './pages/DifferentiatorPage';
+import PricingPage from './pages/PricingPage';
+import FAQPage from './pages/FAQPage';
 import SuperAdminRoute from './components/SuperAdminRoute';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminAuth from './pages/AdminAuth';
@@ -63,12 +68,18 @@ const App: React.FC = () => {
       <Route path="/admin/login" element={<AdminAuth />} />
       <Route path="/admin/signup" element={<AdminAuth />} />
 
-      {/* Public website routes */}
+      {/* Public website separated routes */}
       <Route path="/" element={<Landing />} />
       <Route path="/landing" element={<Landing />} />
+      <Route path="/assistants" element={<AIAssistantsPage />} />
+      <Route path="/ai-assistants-overview" element={<AIAssistantsPage />} />
+      <Route path="/abop-loop" element={<ABOPLoopPage />} />
+      <Route path="/differentiator" element={<DifferentiatorPage />} />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/faq" element={<FAQPage />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+      <Route path="/subscription/plans" element={<PricingPage />} />
       <Route path="/subscription/success" element={<CheckoutSuccess />} />
       <Route path="/subscription/cancel" element={<CheckoutCancel />} />
 

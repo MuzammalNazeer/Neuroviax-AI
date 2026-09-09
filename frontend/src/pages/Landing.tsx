@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
+import LandingNavbar from '../components/LandingNavbar';
+import LandingFooter from '../components/LandingFooter';
 import {
   Sparkles,
   ArrowRight,
@@ -261,52 +263,7 @@ const Landing: React.FC = () => {
       <div className="fixed bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/6 rounded-full blur-[100px] pointer-events-none" />
 
       {/* ── Navbar ────────────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-400 to-teal-200 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
-              <Sparkles className="w-4 h-4 text-emerald-950" />
-            </div>
-            <div>
-              <span className="text-sm font-black font-display tracking-tight text-white">Neuroviax AI</span>
-            </div>
-          </div>
-          <div className="hidden md:flex items-center gap-6 text-xs text-slate-400 font-medium">
-            <a href="#assistants" className="hover:text-emerald-400 transition-colors">6 AI Assistants</a>
-            <a href="#loop" className="hover:text-emerald-400 transition-colors">ABOP Loop</a>
-            <a href="#comparison" className="hover:text-emerald-400 transition-colors">30/70 Differentiator</a>
-            <a href="#pricing" className="hover:text-emerald-400 transition-colors">Pricing</a>
-            <a href="#faq" className="hover:text-emerald-400 transition-colors">FAQ</a>
-            <Link to="/about" className="hover:text-emerald-400 transition-colors">About</Link>
-            <Link to="/contact" className="hover:text-emerald-400 transition-colors">Contact</Link>
-          </div>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <Link
-                to="/dashboard"
-                className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-teal-400 transition-all flex items-center gap-1.5"
-              >
-                Go to Dashboard <ArrowRight className="w-3 h-3" />
-              </Link>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="text-xs text-slate-300 hover:text-white font-semibold transition"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-teal-400 transition-all flex items-center gap-1.5"
-                >
-                  Get Started <ArrowRight className="w-3 h-3" />
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      <LandingNavbar />
 
       {/* ── HERO ──────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center pt-16">
@@ -1018,80 +975,8 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* ── FINAL CTA ─────────────────────────────────────── */}
-      <section className="py-28 relative">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-br from-slate-900 via-emerald-950/40 to-slate-900 border border-emerald-800/40 rounded-3xl p-12 shadow-2xl relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl" />
-            <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-400 to-teal-200 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/20">
-                <Sparkles className="w-7 h-7 text-emerald-950" />
-              </div>
-              <h2 className="text-3xl font-black font-display tracking-tight text-white mb-3">
-                Ready to Autonomize Your Operations?
-              </h2>
-              <p className="text-slate-400 text-sm mb-8 max-w-md mx-auto leading-relaxed">
-                Join the AI-first revolution. Deploy your ABOP workspace in minutes and let AI handle the analysis while your team focuses on decisions.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link to="/register">
-                  <motion.div
-                    whileHover={{ scale: 1.04, y: -1 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm px-8 py-3.5 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
-                  >
-                    <Star className="w-4 h-4" />
-                    Launch Your ABOP Workspace
-                    <ArrowRight className="w-4 h-4" />
-                  </motion.div>
-                </Link>
-                <Link to="/login">
-                  <motion.div
-                    whileHover={{ scale: 1.04 }}
-                    className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-sm px-7 py-3.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer"
-                  >
-                    Sign in to existing account
-                  </motion.div>
-                </Link>
-                <a
-                  href="https://wa.me/923264414694?text=Hi%20Neuroviax%20AI!%20I%20would%20like%20to%20inquire%20about%20your%20platform."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.04 }}
-                    className="bg-emerald-950/80 hover:bg-emerald-900/80 border border-emerald-500/40 text-emerald-300 font-semibold text-sm px-6 py-3.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-950/30"
-                  >
-                    <MessageCircle className="w-4 h-4 text-emerald-400" />
-                    <span>Chat on WhatsApp: 03264414694</span>
-                  </motion.div>
-                </a>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* ── Footer ────────────────────────────────────────── */}
-      <footer className="border-t border-slate-800/60 py-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-400 to-teal-200 flex items-center justify-center">
-              <Sparkles className="w-3 h-3 text-emerald-950" />
-            </div>
-            <span className="text-xs font-black text-slate-400">Neuroviax AI</span>
-            <span className="text-[10px] text-slate-600">ABOP Platform</span>
-          </div>
-          <p className="text-[11px] text-slate-600">
-            AI-First · SME-Focused · Emerging Markets · Pakistan · India · MENA
-          </p>
-        </div>
-      </footer>
+      <LandingFooter />
     </div>
   );
 };
