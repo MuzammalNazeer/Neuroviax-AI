@@ -1,4 +1,49 @@
-# Neuroviax AI — MERN Stack Implementation
+<div align="center">
+
+# ⚡ Neuroviax AI — MERN Stack Implementation
+
+### *Next-Generation Autonomous Enterprise ERP & AI Multi-Business Platform*
+
+<p align="center">
+  <img src="https://img.shields.io/badge/MERN_Stack-Enterprise_Grade-00D26A?style=for-the-badge&logo=mongodb&logoColor=white" alt="MERN" />
+  <img src="https://img.shields.io/badge/Version-1.0.0_Production-6366F1?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge" alt="License" />
+  <img src="https://img.shields.io/badge/Maintained%3F-Yes-06B6D4?style=for-the-badge" alt="Maintained" />
+</p>
+
+---
+
+### 🚀 Technology Stack & Skill Badges
+
+#### 🌐 **Frontend Stack**
+[![React](https://img.shields.io/badge/React_18-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite_6.0-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_3.4-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-%230055FF.svg?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![Zustand](https://img.shields.io/badge/Zustand-%23433e38.svg?style=for-the-badge&logo=react&logoColor=white)](https://zustand-demo.pmnd.rs/)
+[![Lucide Icons](https://img.shields.io/badge/Lucide_Icons-%23F05032.svg?style=for-the-badge&logo=lucide&logoColor=white)](https://lucide.dev/)
+
+#### ⚙️ **Backend & Database**
+[![NodeJS](https://img.shields.io/badge/Node.js_v20+-%23339933.svg?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js_4.x-%23000000.svg?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB_Atlas-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Mongoose](https://img.shields.io/badge/Mongoose_ORM-%23880000.svg?style=for-the-badge&logo=mongoose&logoColor=white)](https://mongoosejs.com/)
+[![JWT](https://img.shields.io/badge/JWT_Tokens-%23000000.svg?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
+[![Passport](https://img.shields.io/badge/Passport_OAuth2.0-%2334E0A1.svg?style=for-the-badge&logo=passport&logoColor=black)](http://www.passportjs.org/)
+
+#### 💳 **Payments, Cloud & Tooling**
+[![Stripe](https://img.shields.io/badge/Stripe_SDK-%23008CDD.svg?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com/)
+[![Firebase](https://img.shields.io/badge/Firebase_Admin-%23FFCA28.svg?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![Nodemailer](https://img.shields.io/badge/Nodemailer_SMTP-%23009688.svg?style=for-the-badge&logo=gmail&logoColor=white)](https://nodemailer.com/)
+[![Postman](https://img.shields.io/badge/Postman_Collection-%23FF6C37.svg?style=for-the-badge&logo=postman&logoColor=white)](https://www.postman.com/)
+[![Nodemon](https://img.shields.io/badge/Nodemon-%2376D04B.svg?style=for-the-badge&logo=nodemon&logoColor=white)](https://nodemon.io/)
+
+</div>
+
+---
+
+## 🌟 Overview
 
 **Neuroviax AI** is a full-stack, enterprise-grade multi-business ERP + AI platform designed for small & medium enterprises. This repository contains a production-ready **MERN (MongoDB, Express, React, Node.js)** implementation covering **Phase 1 (Foundation)** in full, plus an intelligent **Procurement & Demand Forecasting Assistant (Phase 3)** and a **Super Admin Cockpit** for platform governance.
 
@@ -46,17 +91,6 @@
 - Global enterprise telemetry and live system health monitoring.
 - Digital Twin real-time enterprise metrics.
 - User management and platform-wide audit log inspection.
-
----
-
-## 🧱 Tech Stack
-
-| Layer | Technology |
-| :--- | :--- |
-| **Backend API** | Node.js, Express.js, MongoDB (Mongoose), JWT, Bcrypt, Passport.js, Stripe, Nodemailer, Firebase Admin, Helmet, Express-Rate-Limit, Morgan |
-| **Frontend App** | React 18, TypeScript, Vite, Tailwind CSS, Zustand, React Router, Axios, Framer Motion, Lucide Icons, Canvas Confetti |
-| **Database** | MongoDB Atlas / Local MongoDB (with In-Memory fallback for zero-config offline runs) |
-| **Testing & API** | Postman Collection v2.1 (`Neuroviax_API.postman_collection.json`) |
 
 ---
 
