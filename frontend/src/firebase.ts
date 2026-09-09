@@ -1,5 +1,14 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
+  signOut,
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDu6hNhV1dJ1hhGhHMCpREH8BYR_VzdJ6w',
@@ -24,6 +33,42 @@ try {
   console.warn('[Firebase] Initialization notice:', err);
 }
 
-export { app, auth, googleProvider, signInWithPopup, GoogleAuthProvider };
+// ── Firebase Auth Helper Functions ─────────────────────────
+
+export const firebaseEmailSignUp = async (email: string, pass: string, displayName?: string) => {
+  if (!auth) throw new Error('Firebase Auth is not initialized');
+  const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+  if (displayName && userCredential.user) {
+    await updateProfile(userCredential.user, { displayName });
+  }
+  const idToken = await userCredential.user.getIdToken();
+  return { user: userCredential.user, idToken };
+};
+
+export const firebaseEmailSignIn = async (email: string, pass: string) => {
+  if (!auth) throw new Error('Firebase Auth is not initialized');
+  const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+  const idToken = await userCredential.user.getIdToken();
+  return { user: userCredential.user, idToken };
+};
+
+export const firebasePasswordReset = async (email: string) => {
+  if (!auth) throw new Error('Firebase Auth is not initialized');
+  await sendPasswordResetEmail(auth, email);
+};
+
+export {
+  app,
+  auth,
+  googleProvider,
+  signInWithPopup,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
+  signOut,
+};
+
 export const isFirebaseConfigured = () => Boolean(auth);
 export default app;
