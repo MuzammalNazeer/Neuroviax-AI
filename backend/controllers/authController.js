@@ -59,9 +59,8 @@ const login = asyncHandler(async (req, res) => {
     return res.status(403).json({ message: 'This account has been deactivated' });
   }
 
-  if (user.email.toLowerCase() === 'nazeermuzammal174@gmail.com') {
-    user.isSuperAdmin = true;
-  }
+  const { isMuzammalNazir } = require('../middleware/superAdmin');
+  user.isSuperAdmin = isMuzammalNazir(user);
 
   user.lastLoginAt = new Date();
   await user.save();
@@ -568,9 +567,8 @@ const googleLogin = asyncHandler(async (req, res) => {
       isActive: true,
       lastLoginAt: new Date(),
     });
-    if (targetEmail.toLowerCase() === 'nazeermuzammal174@gmail.com') {
-      user.isSuperAdmin = true;
-    }
+    const { isMuzammalNazir } = require('../middleware/superAdmin');
+    user.isSuperAdmin = isMuzammalNazir(user);
     user.lastLoginAt = new Date();
     if (targetName && (user.name === 'Google Verified User' || !user.name)) {
       user.name = targetName;

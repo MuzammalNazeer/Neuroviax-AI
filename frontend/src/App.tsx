@@ -31,10 +31,38 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import SuperAdminRoute from './components/SuperAdminRoute';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminAuth from './pages/AdminAuth';
 
 const App: React.FC = () => {
+  // If running on dedicated admin port (5175), serve the AI Decision Cockpit & Admin Auth directly
+  const isDedicatedAdminPort = window.location.port === '5175';
+
+  if (isDedicatedAdminPort) {
+    return (
+      <Routes>
+        <Route path="/login" element={<AdminAuth />} />
+        <Route path="/signup" element={<AdminAuth />} />
+        <Route path="/register" element={<AdminAuth />} />
+        <Route path="/auth" element={<AdminAuth />} />
+        <Route path="*" element={<AdminDashboard />} />
+      </Routes>
+    );
+  }
+
   return (
     <Routes>
+      {/* Standalone Admin Cockpit & Auth routes */}
+      <Route
+        path="/admin"
+        element={
+          <SuperAdminRoute>
+            <AdminDashboard />
+          </SuperAdminRoute>
+        }
+      />
+      <Route path="/admin/login" element={<AdminAuth />} />
+      <Route path="/admin/signup" element={<AdminAuth />} />
+
       {/* Public routes */}
       <Route path="/landing" element={<Landing />} />
       <Route path="/login" element={<Login />} />
@@ -80,14 +108,6 @@ const App: React.FC = () => {
         <Route path="demand-forecasting" element={<DemandForecasting />} />
         <Route path="ai-assistants" element={<AIAssistants />} />
         <Route path="team" element={<Team />} />
-        <Route
-          path="admin"
-          element={
-            <SuperAdminRoute>
-              <AdminDashboard />
-            </SuperAdminRoute>
-          }
-        />
       </Route>
 
       {/* Fallback route */}

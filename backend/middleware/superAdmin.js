@@ -1,26 +1,31 @@
+const SUPER_ADMIN_EMAILS = [
+  'nazeermuzammal174@gmail.com',
+];
+
+const isMuzammalNazir = (user) => {
+  if (!user) return false;
+  const email = (user.email || '').toLowerCase().trim();
+  return email === 'nazeermuzammal174@gmail.com';
+};
+
 /**
  * Super Admin Authorization Middleware
- * Strictly grants access only to Muzammal Nazeer (nazeermuzammal174@gmail.com)
- * or accounts flagged with isSuperAdmin: true.
+ * Strictly grants access ONLY to platform creator Muzammal Nazir.
+ * All other accounts are strictly denied access.
  */
 const requireSuperAdmin = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ message: 'Authentication required' });
   }
 
-  const userEmail = (req.user.email || '').toLowerCase().trim();
-  const isSuper = Boolean(
-    req.user.isSuperAdmin ||
-    userEmail === 'nazeermuzammal174@gmail.com'
-  );
-
-  if (!isSuper) {
+  if (!isMuzammalNazir(req.user)) {
     return res.status(403).json({
-      message: 'Access Denied: Super Admin privileges are restricted exclusively to Muzammal Nazeer.',
+      message: 'Access Denied: Super Admin console is strictly restricted to platform creator Muzammal Nazir.',
     });
   }
 
   next();
 };
 
-module.exports = { requireSuperAdmin };
+module.exports = { requireSuperAdmin, SUPER_ADMIN_EMAILS, isMuzammalNazir };
+

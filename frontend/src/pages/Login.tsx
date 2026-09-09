@@ -29,47 +29,20 @@ import {
 
 const GOOGLE_ACCOUNTS = [
   {
-    name: 'Nazeer Muzammal',
-    email: 'nazeermuzammal174@gmail.com',
-    initials: 'NM',
-    bg: 'bg-teal-600',
-    type: 'Firebase Project Owner',
-  },
-  {
-    name: 'Muhammad Hamza',
-    email: 'muhammad.hamza@gmail.com',
-    initials: 'MH',
-    bg: 'bg-emerald-600',
-    type: 'Personal Google Account',
-  },
-  {
-    name: 'Demo Owner',
+    name: 'Demo Store Owner',
     email: 'demo@neuroviax.ai',
     initials: 'DO',
-    bg: 'bg-blue-600',
-    type: 'Google Workspace Account',
-  },
-  {
-    name: 'Admin Enterprise',
-    email: 'admin@neuroviax.ai',
-    initials: 'AE',
-    bg: 'bg-indigo-600',
-    type: 'Enterprise Directory',
+    bg: 'bg-emerald-600',
+    type: 'Demo Business Account',
   },
 ];
 
 const DEMO_PERSONAS = [
   {
-    role: 'Owner / Admin',
+    role: 'Demo Owner',
     email: 'demo@neuroviax.ai',
-    badge: 'Full Access',
+    badge: 'Store Demo',
     color: 'border-emerald-500/40 text-emerald-400 bg-emerald-950/40',
-  },
-  {
-    role: 'Admin',
-    email: 'admin@neuroviax.ai',
-    badge: 'Team + Setup',
-    color: 'border-violet-500/40 text-violet-400 bg-violet-950/40',
   },
   {
     role: 'Procurement',
@@ -422,7 +395,7 @@ const Login: React.FC = () => {
               </span>
               <span className="text-[10px] text-slate-500">Tap to load</span>
             </div>
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5">
               {DEMO_PERSONAS.map((p) => (
                 <button
                   key={p.role}

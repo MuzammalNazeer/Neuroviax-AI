@@ -30,12 +30,14 @@ export interface User {
   stripeCustomerId?: string;
 }
 
+const SUPER_ADMIN_EMAILS = [
+  'nazeermuzammal174@gmail.com',
+];
+
 export const isUserSuperAdmin = (user: User | null): boolean => {
   if (!user) return false;
-  return Boolean(
-    user.isSuperAdmin ||
-    (user.email && user.email.toLowerCase().trim() === 'nazeermuzammal174@gmail.com')
-  );
+  const email = (user.email || '').toLowerCase().trim();
+  return email === 'nazeermuzammal174@gmail.com';
 };
 
 interface AuthState {

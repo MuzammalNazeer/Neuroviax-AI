@@ -36,8 +36,7 @@ const SuperAdminRoute: React.FC<SuperAdminRouteProps> = ({ children }) => {
           </div>
           <h2 className="text-2xl font-black text-white">Access Denied</h2>
           <p className="text-xs text-slate-400 leading-relaxed">
-            This console is reserved exclusively for Platform Super Administrator{' '}
-            <strong className="text-rose-300">Muzammal Nazeer</strong> (<code>nazeermuzammal174@gmail.com</code>).
+            This console is strictly private and reserved exclusively for authorized Platform Super Administrators.
             Your account does not possess Super Admin access privileges.
           </p>
           <div className="pt-2">

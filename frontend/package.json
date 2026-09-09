@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5173",
+    "dev:website": "vite --port 5173",
+    "dev:admin": "vite --port 5175",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
