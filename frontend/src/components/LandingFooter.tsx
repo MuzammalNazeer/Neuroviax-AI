@@ -78,8 +78,8 @@ export const LandingFooter: React.FC = () => {
           {/* Brand Col */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-emerald-400 to-teal-200 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-emerald-950" />
+              <div className="w-8 h-8 rounded-xl overflow-hidden bg-white flex items-center justify-center p-0.5 border border-slate-700 shadow-md">
+                <img src="/logo.png" alt="Neuroviax AI Logo" className="w-full h-full object-contain rounded-lg" />
               </div>
               <span className="text-sm font-black text-white">Neuroviax AI</span>
             </Link>

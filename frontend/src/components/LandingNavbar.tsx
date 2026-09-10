@@ -48,8 +48,8 @@ export const LandingNavbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo / Brand */}
         <Link to="/" className="flex items-center gap-3 group focus:outline-none">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-400 via-teal-300 to-emerald-200 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform shrink-0">
-            <Sparkles className="w-4 h-4 text-emerald-950" />
+          <div className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform shrink-0 p-0.5 border border-slate-700/60">
+            <img src="/logo.png" alt="Neuroviax AI Logo" className="w-full h-full object-contain rounded-lg" />
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-black font-display tracking-tight text-white group-hover:text-emerald-300 transition-colors">
@@ -90,6 +90,7 @@ export const LandingNavbar: React.FC = () => {
 
         {/* Action CTAs / User Auth */}
         <div className="hidden sm:flex items-center gap-3">
+
           {user ? (
             <button
               onClick={() => navigate('/dashboard')}

@@ -48,10 +48,10 @@ const ForgotPassword: React.FC = () => {
         {/* Header */}
         <div className="text-center space-y-2">
           <motion.div
-            whileHover={{ rotate: 15, scale: 1.1 }}
-            className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-400 to-teal-200 flex items-center justify-center text-emerald-950 mx-auto shadow-lg shadow-emerald-500/20"
+            whileHover={{ scale: 1.05 }}
+            className="w-14 h-14 rounded-2xl bg-white p-1 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/20 border border-slate-700/60 overflow-hidden"
           >
-            <Sparkles className="w-6 h-6" />
+            <img src="/logo.png" alt="Neuroviax AI Logo" className="w-full h-full object-contain rounded-xl" />
           </motion.div>
           <h1 className="text-2xl font-black font-display tracking-tight text-white">
             Forgot Password?

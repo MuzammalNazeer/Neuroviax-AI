@@ -43,13 +43,13 @@
 
 ---
 
-## 🌟 Overview
+##  Overview
 
 **Neuroviax AI** is a full-stack, enterprise-grade multi-business ERP + AI platform designed for small & medium enterprises. This repository contains a production-ready **MERN (MongoDB, Express, React, Node.js)** implementation covering **Phase 1 (Foundation)** in full, plus an intelligent **Procurement & Demand Forecasting Assistant (Phase 3)** and a **Super Admin Cockpit** for platform governance.
 
 ---
 
-## 🧭 Public Web Architecture & Dedicated Pages
+##  Public Web Architecture & Dedicated Pages
 
 Every core marketing and architectural pillar is implemented as an independent, fully-featured page equipped with the shared **`LandingNavbar`** (active route indicator & mobile menu) and **`LandingFooter`**:
 
@@ -65,7 +65,7 @@ Every core marketing and architectural pillar is implemented as an independent, 
 
 ---
 
-## ✨ Core Features & Modules
+##  Core Features & Modules
 
 ### 1. 🔐 Authentication & Identity
 - **JWT Authentication** — Secure access and refresh token lifecycle.
@@ -74,43 +74,43 @@ Every core marketing and architectural pillar is implemented as an independent, 
 - **Password Reset via OTP** — 6-digit email verification code with SHA-256 hashing and a 10-minute expiry window.
 - **Multi-Tenant / Role-Based Access Control (RBAC)** — Roles: `owner`, `admin`, `manager`, `staff`, `accountant`.
 
-### 2. 🏢 Business & Multi-Branch Management
+### 2.  Business & Multi-Branch Management
 - Multi-business context with currency, industry, and fiscal configuration.
 - Multi-branch and warehouse inventory tracking.
 - Team member invitations with role assignments and active/inactive toggles.
 
-### 3. 📦 Products & Inventory Management
+### 3.  Products & Inventory Management
 - **Product Master Catalog** — SKU, category, barcode, cost/sell price, and reorder thresholds.
 - **Inventory Movements** — Comprehensive audit logging for stock `in`, `out`, and `adjustment`.
 - **Automated Low-Stock Alerts** — Instant triggers when inventory drops below safety thresholds.
 
-### 4. 🛒 Point of Sale (POS) & Order Management
+### 4. Point of Sale (POS) & Order Management
 - Unified Sales and Purchase order management.
 - Real-time cart calculations with tax, discount, and inventory deduction.
 - Order lifecycle states: `pending`, `processing`, `completed`, `cancelled`.
 
-### 5. 💳 Payments & Gateway Integrations
+### 5.  Payments & Gateway Integrations
 - Gateway support for **Stripe**, **JazzCash**, **Easypaisa**, **Razorpay**, **Bank Transfer**, and **Cash**.
 - Cash flow analytics snapshot and real-time revenue aggregation.
 - Account verification gating for secure transactions.
 
-### 6. 🤖 AI Intelligence & ML Demand Forecasting
+### 6.  AI Intelligence & ML Demand Forecasting
 - **Demand Velocity Forecasting** — Time-series forecast of product sales and stock depletion risk.
 - **Rule-based Procurement Assistant** — Autonomous reorder suggestions with confidence ratings and risk tiers (`low`, `medium`, `high`).
 - **Human-in-the-Loop Decisions** — One-click approval auto-generates purchase orders.
 
-### 7. 📊 Reports & Financial Analytics
+### 7. Reports & Financial Analytics
 - Live report generators for Sales, Inventory, Profit & Loss, and Tax.
 - Categorized expense tracking and monthly spending breakdowns.
 
-### 8. 🛡️ Super Admin Cockpit (Muzammal Nazir)
+### 8.  Super Admin Cockpit (Muzammal Nazir)
 - Global enterprise telemetry and live system health monitoring.
 - Digital Twin real-time enterprise metrics.
 - User management and platform-wide audit log inspection.
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 neuroviax-mern/
@@ -150,7 +150,7 @@ neuroviax-mern/
 
 ---
 
-## 🚀 Quick Start Guide
+##  Quick Start Guide
 
 ### Prerequisites
 - **Node.js** v18 or higher
@@ -200,10 +200,10 @@ Open your browser and navigate to `http://localhost:5173`.
 
 ---
 
-## 📮 Postman API Testing
+##  Postman API Testing
 
 An importable Postman Collection is included in the root directory:
-👉 **[`Neuroviax_API.postman_collection.json`](./Neuroviax_API.postman_collection.json)**
+ **[`Neuroviax_API.postman_collection.json`](./Neuroviax_API.postman_collection.json)**
 
 ### How to use:
 1. Open **Postman** and click **Import**.
@@ -213,7 +213,7 @@ An importable Postman Collection is included in the root directory:
 
 ---
 
-## 🔑 Environment Variables Reference
+##  Environment Variables Reference
 
 ### Backend (`backend/.env`)
 ```env
@@ -244,7 +244,7 @@ VITE_API_BASE_URL=http://localhost:5000/api
 
 ---
 
-## 🛡️ License & Author
+##  License & Author
 
 - **Platform Creator & Lead Developer**: Muzammal Nazir
 - **Project**: Neuroviax AI — Next-Gen Enterprise ERP & Intelligence Platform

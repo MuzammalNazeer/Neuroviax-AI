@@ -9,6 +9,7 @@ const {
   rejectRecommendation,
   getDemandForecast,
   getForecastSummary,
+  getProductRecommendations,
 } = require('../controllers/aiController');
 
 router.use(protect, requireBusinessContext);
@@ -16,6 +17,10 @@ router.use(protect, requireBusinessContext);
 // ML Demand Forecasting Endpoints
 router.get('/forecast', getDemandForecast);
 router.get('/forecast/summary', getForecastSummary);
+
+// Collaborative Filtering Product Recommendations
+router.get('/product-recommendations', getProductRecommendations);
+router.get('/recommendations/collaborative-filtering', getProductRecommendations);
 
 // AI Recommendation Engine Endpoints
 router.post('/recommendations/generate', allowRoles('owner', 'admin', 'manager'), generateRecommendations);

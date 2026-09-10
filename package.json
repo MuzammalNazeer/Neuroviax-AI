@@ -1,0 +1,16 @@
+{
+  "name": "neuroviax-mern-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Neuroviax AI - Root workspace orchestrator",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:all": "concurrently -n \"backend,website,admin\" -c \"green,cyan,magenta\" \"npm --prefix backend run dev\" \"npm --prefix frontend run dev:website\" \"npm --prefix frontend run dev:admin\"",
+    "dev:website": "npm --prefix frontend run dev:website",
+    "dev:admin": "npm --prefix frontend run dev:admin",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "seed": "npm --prefix backend run seed",
+    "build": "npm --prefix frontend run build"
+  }
+}

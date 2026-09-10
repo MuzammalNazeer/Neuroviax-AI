@@ -118,13 +118,8 @@ const AdminAuth: React.FC = () => {
       {/* Top Header */}
       <header className="max-w-5xl w-full mx-auto flex items-center justify-between py-2">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-900 via-blue-800 to-indigo-950 flex items-center justify-center p-0.5 shadow-md shadow-blue-900/10">
-            <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-indigo-400 fill-none stroke-current stroke-2">
-                <polygon points="12 2 2 8.5 2 15.5 12 22 22 15.5 22 8.5 12 2" strokeLinejoin="round" />
-                <circle cx="12" cy="12" r="3" fill="currentColor" />
-              </svg>
-            </div>
+          <div className="w-10 h-10 rounded-2xl overflow-hidden bg-white flex items-center justify-center p-0.5 shadow-md shadow-blue-900/10 border border-slate-200">
+            <img src="/logo.png" alt="Neuroviax AI Logo" className="w-full h-full object-contain rounded-xl" />
           </div>
           <span className="text-base font-black tracking-tight text-slate-900 font-display uppercase">
             NEUROVIAX AI
