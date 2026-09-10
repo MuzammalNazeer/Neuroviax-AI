@@ -32,6 +32,12 @@
 [![JWT](https://img.shields.io/badge/JWT_Tokens-%23000000.svg?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
 [![Passport](https://img.shields.io/badge/Passport_OAuth2.0-%2334E0A1.svg?style=for-the-badge&logo=passport&logoColor=black)](http://www.passportjs.org/)
 
+#### 🧠 **AI, Machine Learning & Algorithms**
+[![Machine Learning](https://img.shields.io/badge/Machine_Learning-Collaborative_Filtering-8A2BE2?style=for-the-badge)](https://en.wikipedia.org/wiki/Collaborative_filtering)
+[![Cosine Similarity](https://img.shields.io/badge/Vector_Math-Cosine_Similarity-FF1493?style=for-the-badge)](https://en.wikipedia.org/wiki/Cosine_similarity)
+[![Time Series](https://img.shields.io/badge/Time_Series-Exponential_Smoothing-00BFFF?style=for-the-badge)](https://en.wikipedia.org/wiki/Exponential_smoothing)
+[![EOQ](https://img.shields.io/badge/Supply_Chain-EOQ_Optimization-32CD32?style=for-the-badge)](https://en.wikipedia.org/wiki/Economic_order_quantity)
+
 #### 💳 **Payments, Cloud & Tooling**
 [![Stripe](https://img.shields.io/badge/Stripe_SDK-%23008CDD.svg?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com/)
 [![Firebase](https://img.shields.io/badge/Firebase_Admin-%23FFCA28.svg?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
@@ -45,7 +51,13 @@
 
 ##  Overview
 
-**Neuroviax AI** is a full-stack, enterprise-grade multi-business ERP + AI platform designed for small & medium enterprises. This repository contains a production-ready **MERN (MongoDB, Express, React, Node.js)** implementation covering **Phase 1 (Foundation)** in full, plus an intelligent **Procurement & Demand Forecasting Assistant (Phase 3)** and a **Super Admin Cockpit** for platform governance.
+**Neuroviax AI** is a full-stack, enterprise-grade multi-business ERP + AI platform designed for small & medium enterprises. This repository contains a production-ready **MERN (MongoDB, Express, React, Node.js)** implementation featuring:
+- **Phase 1 (Core Foundation)**: Multi-business, multi-branch ERP, RBAC, inventory, POS, and financial tracking.
+- **Phase 3 (AI Intelligence & Recommendation Engine)**: 
+  - **Collaborative Filtering Engine**: Item-based Cosine Similarity vectors, user neighbor clustering, and "Frequently Bought Together" companion bundles.
+  - **Interactive Demand Forecasting Cockpit**: Real-time Exponential Smoothing, Moving Average, and Linear Trend time-series with confidence bounds and EOQ calculations.
+  - **Autonomous Conversational Copilot**: Instant contextual business decision assistance.
+- **Phase 4 (Super Admin & Platform Governance)**: Multi-tenant telemetry and Digital Twin enterprise monitoring.
 
 ---
 
@@ -94,16 +106,29 @@ Every core marketing and architectural pillar is implemented as an independent, 
 - Cash flow analytics snapshot and real-time revenue aggregation.
 - Account verification gating for secure transactions.
 
-### 6.  AI Intelligence & ML Demand Forecasting
-- **Demand Velocity Forecasting** — Time-series forecast of product sales and stock depletion risk.
-- **Rule-based Procurement Assistant** — Autonomous reorder suggestions with confidence ratings and risk tiers (`low`, `medium`, `high`).
-- **Human-in-the-Loop Decisions** — One-click approval auto-generates purchase orders.
+### 6. 📈 AI Intelligence & ML Demand Forecasting Cockpit
+- **Multi-Algorithm Time-Series Forecasting** — Interactive switcher between **Exponential Smoothing** (dynamic $\alpha$ parameter), **Simple Moving Average (SMA)**, and **Linear Trend Regression**.
+- **Statistical Confidence Intervals** — Upper and lower bound trajectory cones for volatility and risk assessment.
+- **Stockout Risk Probability & Depletion Timelines** — Calculates exact velocity, safety buffer, and days until inventory exhaustion.
+- **Automated Economic Order Quantity (EOQ)** — Optimizes replenishment batch sizes while factoring holding and ordering costs.
+- **Human-in-the-Loop Procurement** — One-click transformation of forecast recommendations into formal Purchase Orders.
 
-### 7. Reports & Financial Analytics
+### 7. 🧠 Collaborative Filtering & Cross-Sell Recommendation Engine
+- **Item-Based Collaborative Filtering** — Calculates **Cosine Similarity** across historical customer purchase vectors to discover item affinity.
+- **User-Based Neighbor Discovery** — Discovers customer clusters with similar purchasing behavior to recommend cross-catalog items.
+- **"Frequently Bought Together" Companion Discovery** — Real-time companion bundling for high-conversion upsell and cross-sell promotions.
+- **Customer Affinity Profiling** — Tracks customer purchase velocity, favorite categories, lifetime spend, and repeat purchase likelihood.
+- **Interactive Decision Cockpit (`/recommendations`)** — Dynamic customer persona switching, live similarity matrix exploration, and 1-click cart insertion.
+
+### 8. 🤖 Autonomous Business Assistant & Conversational Copilot
+- Context-aware natural language assistant answering queries on sales velocity, inventory health, and cash flow.
+- Pre-packaged executive prompts for instantaneous strategic summaries.
+
+### 9. 📊 Reports & Financial Analytics
 - Live report generators for Sales, Inventory, Profit & Loss, and Tax.
 - Categorized expense tracking and monthly spending breakdowns.
 
-### 8.  Super Admin Cockpit (Muzammal Nazir)
+### 10. 👑 Super Admin Cockpit (Muzammal Nazir)
 - Global enterprise telemetry and live system health monitoring.
 - Digital Twin real-time enterprise metrics.
 - User management and platform-wide audit log inspection.
@@ -114,29 +139,33 @@ Every core marketing and architectural pillar is implemented as an independent, 
 
 ```
 neuroviax-mern/
+├── package.json                          # Workspace root orchestrator scripts (dev:all, dev:website, dev:admin)
+├── Neuroviax_AI_Local_Development_and_Setup_Guide.pdf # Printable full developer & architecture guide
+├── neuroviax_setup_and_chat_guide.html    # Interactive HTML visual setup & API test guide
+├── Neuroviax_API.postman_collection.json # Importable Postman collection for all endpoints
 ├── backend/                              # Express & Node.js REST API
 │   ├── config/                           # Database, Passport, and Stripe configurations
-│   ├── controllers/                      # Business logic controllers (16 modules)
+│   ├── controllers/                      # Business logic controllers (aiController, authController, etc.)
 │   ├── middleware/                       # Auth, RBAC, Super Admin, Error Handlers
 │   ├── models/                           # Mongoose data schemas (17 models)
-│   ├── routes/                           # API route definitions
+│   ├── routes/                           # API route definitions (aiRoutes, authRoutes, orderRoutes, etc.)
 │   ├── seed/                             # Database seed scripts
-│   ├── utils/                            # Email, tokens, and audit helpers
+│   ├── utils/                            # collaborativeFiltering.js, forecastingEngine.js, email, audit
 │   └── server.js                         # Backend entry point
 ├── frontend/                             # React 18 + Vite + TypeScript
+│   ├── public/                           # Favicon, Neuroviax brand logos, and static assets
 │   ├── src/
 │   │   ├── api/                          # Axios API client
 │   │   ├── components/                   # LandingNavbar, LandingFooter, ProtectedRoute, Layout
 │   │   ├── context/                      # AuthContext & state providers
 │   │   ├── hooks/                        # Custom React hooks (e.g., SEO metadata)
 │   │   ├── pages/                        # 30+ Page components:
+│   │   │   ├── Recommendations.tsx       # /recommendations — Collaborative Filtering Cockpit
+│   │   │   ├── DemandForecasting.tsx     # /demand-forecasting — ML Forecasting Cockpit
 │   │   │   ├── AIAssistantsPage.tsx      # /assistants — 6 AI Copilots Showcase
 │   │   │   ├── ABOPLoopPage.tsx          # /abop-loop — 5-Stage Closed Loop
 │   │   │   ├── DifferentiatorPage.tsx    # /differentiator — 30/70 Moat Breakdown
 │   │   │   ├── PricingPage.tsx           # /pricing — Transparent PKR/USD Tiers
-│   │   │   ├── FAQPage.tsx               # /faq — Searchable Knowledge Base
-│   │   │   ├── About.tsx                 # /about — Architecture & Leadership
-│   │   │   ├── Contact.tsx               # /contact — 24/7 Support & WhatsApp
 │   │   │   ├── Dashboard.tsx             # Protected ERP Command Center
 │   │   │   ├── AdminDashboard.tsx        # Super Admin Cockpit
 │   │   │   └── ... (POS, Products, Inventory, Orders, Payments, Reports)
@@ -144,7 +173,6 @@ neuroviax-mern/
 │   │   ├── App.tsx                       # React application router
 │   │   └── main.tsx                      # Frontend entry point
 │   └── vite.config.ts                    # Vite config with API proxy
-├── Neuroviax_API.postman_collection.json # Importable Postman collection for all endpoints
 └── README.md                             # Project documentation
 ```
 
@@ -155,11 +183,29 @@ neuroviax-mern/
 ### Prerequisites
 - **Node.js** v18 or higher
 - **npm** v9 or higher
-- Optional: **MongoDB** running locally or a MongoDB Atlas URI (if omitted, falls back to an in-memory DB)
+- Optional: **MongoDB** running locally or a MongoDB Atlas URI (if omitted, seamlessly falls back to in-memory store)
 
 ---
 
-### 1. Backend Setup
+### Option A: One-Command Root Orchestration (Recommended)
+
+From the root directory (`neuroviax-mern/`):
+
+```bash
+# 1. Run all services concurrently (Backend + Public Website + Admin Portal)
+npm run dev:all
+
+# Or run individually:
+npm run dev:backend   # Express API server (Port 5000)
+npm run dev:website   # Public Website & ERP (Port 5173)
+npm run dev:admin     # Super Admin Cockpit (Port 5175)
+```
+
+---
+
+### Option B: Step-by-Step Manual Setup
+
+#### 1. Backend Setup
 
 ```bash
 cd backend
@@ -179,9 +225,7 @@ npm run dev
 
 The backend will be live at `http://localhost:5000`.
 
----
-
-### 2. Frontend Setup
+#### 2. Frontend Setup
 
 ```bash
 cd frontend
@@ -200,6 +244,22 @@ Open your browser and navigate to `http://localhost:5173`.
 
 ---
 
+## 🧠 AI & Machine Learning REST API Endpoints
+
+All AI endpoints are mounted under `/api/ai` and fully authenticated:
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/ai/forecast` | Returns time-series demand forecasts, stockout risk percentages, and EOQ calculations |
+| `GET` | `/api/ai/procurement-suggestions` | Returns autonomous reorder suggestions with risk ratings (`low`/`med`/`high`) |
+| `GET` | `/api/ai/recommendations` | Item-based collaborative filtering across the product catalog |
+| `GET` | `/api/ai/recommendations/customer/:customerId` | Personalized user-based collaborative recommendations for a specific customer |
+| `GET` | `/api/ai/recommendations/companions/:productId` | Cross-sell "Frequently Bought Together" companion bundles for a product |
+| `GET` | `/api/ai/recommendations/matrix` | Full interaction matrix & customer purchase affinity score summary |
+| `POST` | `/api/ai/chat` | Autonomous conversational business assistant query |
+
+---
+
 ##  Postman API Testing
 
 An importable Postman Collection is included in the root directory:
@@ -209,7 +269,7 @@ An importable Postman Collection is included in the root directory:
 1. Open **Postman** and click **Import**.
 2. Select `Neuroviax_API.postman_collection.json`.
 3. Run the **`1. Authentication > Login User`** request. The access token is automatically saved into the collection variable `{{token}}`.
-4. Run and test any endpoint across all 11 categories (Products, POS, Inventory, Payments, AI, Admin, etc.).
+4. Run and test any endpoint across all categories (AI, Products, POS, Inventory, Payments, Admin, etc.).
 
 ---
 
