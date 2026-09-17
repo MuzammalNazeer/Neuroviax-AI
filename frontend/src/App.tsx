@@ -19,6 +19,7 @@ import Suppliers from './pages/Suppliers';
 import Recommendations from './pages/Recommendations';
 import DemandForecasting from './pages/DemandForecasting';
 import CashFlowPrediction from './pages/CashFlowPrediction';
+import AnomalyDetection from './pages/AnomalyDetection';
 import AIAssistants from './pages/AIAssistants';
 import Team from './pages/Team';
 import Expenses from './pages/Expenses';
@@ -116,6 +117,7 @@ const App: React.FC = () => {
         <Route path="/recommendations" element={<Recommendations />} />
         <Route path="/demand-forecasting" element={<DemandForecasting />} />
         <Route path="/cash-flow-prediction" element={<CashFlowPrediction />} />
+        <Route path="/anomaly-detection" element={<AnomalyDetection />} />
         <Route path="/ai-assistants" element={<AIAssistants />} />
         <Route path="/team" element={<Team />} />
       </Route>

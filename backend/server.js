@@ -34,6 +34,7 @@ const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const anomalyRoutes = require('./routes/anomalyRoutes');
 
 const app = express();
 
@@ -110,6 +111,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/ai/anomalies', anomalyRoutes);
+app.use('/api/anomalies', anomalyRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportRoutes);

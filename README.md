@@ -34,8 +34,10 @@
 
 #### 🧠 **AI, Machine Learning & Algorithms**
 [![Machine Learning](https://img.shields.io/badge/Machine_Learning-Collaborative_Filtering-8A2BE2?style=for-the-badge)](https://en.wikipedia.org/wiki/Collaborative_filtering)
+[![Isolation Forest](https://img.shields.io/badge/Anomaly_Detection-Isolation_Forest_(iForest)-E11D48?style=for-the-badge)](https://en.wikipedia.org/wiki/Isolation_forest)
 [![Cosine Similarity](https://img.shields.io/badge/Vector_Math-Cosine_Similarity-FF1493?style=for-the-badge)](https://en.wikipedia.org/wiki/Cosine_similarity)
 [![Time Series](https://img.shields.io/badge/Time_Series-Exponential_Smoothing-00BFFF?style=for-the-badge)](https://en.wikipedia.org/wiki/Exponential_smoothing)
+[![SHAP Attribution](https://img.shields.io/badge/Explainability-SHAP_Attribution-D97706?style=for-the-badge)](https://en.wikipedia.org/wiki/Shapley_value)
 [![EOQ](https://img.shields.io/badge/Supply_Chain-EOQ_Optimization-32CD32?style=for-the-badge)](https://en.wikipedia.org/wiki/Economic_order_quantity)
 
 #### 💳 **Payments, Cloud & Tooling**
@@ -132,11 +134,19 @@ Every core marketing and architectural pillar is implemented as an independent, 
 - **AI Strategic Liquidity Advisory** — Automated proactive warnings, working capital recommendations, and cash runway alerts.
 - **Modern Clean Glassmorphic Theme** — Redesigned with a crisp, executive emerald/slate palette matching the central dashboard.
 
-### 10. 📊 Reports & Financial Analytics
+### 10. 🛡️ Isolation Forest Anomaly Detection & Fraud Shield (`/anomaly-detection`)
+- **Unsupervised iTree Ensemble Architecture** — Pure mathematical implementation of **Isolation Forest ($t = 100$, $\psi = 256$)** using recursive random hyperplanes and the exact Euler-Mascheroni constant ($\gamma = 0.577215$) to compute expected BST depth $c(n)$ and anomaly score $s(x, n) = 2^{-E(h(x))/c(n)}$.
+- **Multi-Domain Vector Extraction**:
+  - **Transaction & Payment Fraud**: Isolates outlier amounts, Z-score deviations, 1h velocity bursts, off-hours circadian spikes (1 AM - 5 AM), payment gateway mismatches, and retry bursts.
+  - **Inventory Shrinkage & Loss**: Identifies unrecorded phantom stock drains, physical count vs recorded balance variances, abnormal write-off surges, and safety buffer breaches.
+- **Explainable AI (SHAP-like Feature Attribution)** — Real-time decomposition of primary drivers with percentage contribution bars and Z-score deviation metrics.
+- **Interactive High-Contrast Enterprise Cockpit** — 5-bin score spectrum histogram, live contamination slider ($2\% - 20\%$), domain filters, and 1-click autonomous/HITL mitigations (*Freeze Disbursement*, *Order Physical Stock Count*, *Quarantine SKU Batch*, *Dismiss False Positive*).
+
+### 11. 📊 Reports & Financial Analytics
 - Live report generators for Sales, Inventory, Profit & Loss, and Tax.
 - Categorized expense tracking and monthly spending breakdowns.
 
-### 11. 👑 Super Admin Cockpit (Muzammal Nazir)
+### 12. 👑 Super Admin Cockpit (Muzammal Nazir)
 - Global enterprise telemetry and live system health monitoring.
 - Digital Twin real-time enterprise metrics.
 - User management and platform-wide audit log inspection.
@@ -156,9 +166,9 @@ neuroviax-mern/
 │   ├── controllers/                      # Business logic controllers (aiController, authController, etc.)
 │   ├── middleware/                       # Auth, RBAC, Super Admin, Error Handlers
 │   ├── models/                           # Mongoose data schemas (17 models)
-│   ├── routes/                           # API route definitions (aiRoutes, authRoutes, orderRoutes, etc.)
+│   ├── routes/                           # API route definitions (aiRoutes, anomalyRoutes, authRoutes, etc.)
 │   ├── seed/                             # Database seed scripts
-│   ├── utils/                            # collaborativeFiltering.js, forecastingEngine.js, email, audit
+│   ├── utils/                            # isolationForest.js, anomalyDetectionEngine.js, collaborativeFiltering.js
 │   └── server.js                         # Backend entry point
 ├── frontend/                             # React 18 + Vite + TypeScript
 │   ├── public/                           # Favicon, Neuroviax brand logos, and static assets
@@ -168,8 +178,10 @@ neuroviax-mern/
 │   │   ├── context/                      # AuthContext & state providers
 │   │   ├── hooks/                        # Custom React hooks (e.g., SEO metadata)
 │   │   ├── pages/                        # 30+ Page components:
+│   │   │   ├── AnomalyDetection.tsx      # /anomaly-detection — Isolation Forest Fraud & Shrinkage Shield
 │   │   │   ├── Recommendations.tsx       # /recommendations — Collaborative Filtering Cockpit
 │   │   │   ├── DemandForecasting.tsx     # /demand-forecasting — ML Forecasting Cockpit
+│   │   │   ├── CashFlowPrediction.tsx    # /cash-flow-prediction — Liquidity ML Cockpit
 │   │   │   ├── AIAssistantsPage.tsx      # /assistants — 6 AI Copilots Showcase
 │   │   │   ├── ABOPLoopPage.tsx          # /abop-loop — 5-Stage Closed Loop
 │   │   │   ├── DifferentiatorPage.tsx    # /differentiator — 30/70 Moat Breakdown

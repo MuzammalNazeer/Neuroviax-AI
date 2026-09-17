@@ -28,4 +28,16 @@ router.get('/recommendations', listRecommendations);
 router.patch('/recommendations/:id/approve', allowRoles('owner', 'admin', 'manager'), approveRecommendation);
 router.patch('/recommendations/:id/reject', allowRoles('owner', 'admin', 'manager'), rejectRecommendation);
 
+// Isolation Forest Anomaly Detection Endpoints
+const {
+  detectAnomalies,
+  getAnomalyMetrics,
+  resolveAnomaly,
+} = require('../controllers/anomalyController');
+
+router.get('/anomalies', detectAnomalies);
+router.post('/anomalies/detect', detectAnomalies);
+router.get('/anomalies/metrics', getAnomalyMetrics);
+router.post('/anomalies/resolve', allowRoles('owner', 'admin', 'manager', 'accountant'), resolveAnomaly);
+
 module.exports = router;
