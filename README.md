@@ -124,11 +124,19 @@ Every core marketing and architectural pillar is implemented as an independent, 
 - Context-aware natural language assistant answering queries on sales velocity, inventory health, and cash flow.
 - Pre-packaged executive prompts for instantaneous strategic summaries.
 
-### 9. 📊 Reports & Financial Analytics
+### 9. 💵 Machine Learning Cash-Flow Prediction Cockpit (`/cash-flow-prediction`)
+- **Ensemble Machine Learning Architecture** — Blends **XGBoost tree stumps (45%)**, **LightGBM histogram gradient boosting (35%)**, and **Seasonal Exponential Moving Averages (20%)**.
+- **Multi-Horizon Liquidity Forecasts** — Interactive projections for **7-Day**, **14-Day**, **30-Day**, and **90-Day** business run-rates.
+- **Uncertainty Bounds & Confidence Cones** — Upper/lower standard deviation bounds to detect insolvency risks well in advance.
+- **Feature Importance Breakdown** — Quantifies the impact of historical net flows, rolling moving averages, day-of-week seasonality, and expenses.
+- **AI Strategic Liquidity Advisory** — Automated proactive warnings, working capital recommendations, and cash runway alerts.
+- **Modern Clean Glassmorphic Theme** — Redesigned with a crisp, executive emerald/slate palette matching the central dashboard.
+
+### 10. 📊 Reports & Financial Analytics
 - Live report generators for Sales, Inventory, Profit & Loss, and Tax.
 - Categorized expense tracking and monthly spending breakdowns.
 
-### 10. 👑 Super Admin Cockpit (Muzammal Nazir)
+### 11. 👑 Super Admin Cockpit (Muzammal Nazir)
 - Global enterprise telemetry and live system health monitoring.
 - Digital Twin real-time enterprise metrics.
 - User management and platform-wide audit log inspection.
@@ -250,6 +258,9 @@ All AI endpoints are mounted under `/api/ai` and fully authenticated:
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
+| `GET` | `/api` | Root API directory & service health status index |
+| `GET` | `/api/health` | Service uptime and heartbeat check |
+| `GET` | `/api/payments/cash-flow-prediction` | XGBoost & LightGBM ensemble liquidity forecast (7d/14d/30d/90d) |
 | `GET` | `/api/ai/forecast` | Returns time-series demand forecasts, stockout risk percentages, and EOQ calculations |
 | `GET` | `/api/ai/procurement-suggestions` | Returns autonomous reorder suggestions with risk ratings (`low`/`med`/`high`) |
 | `GET` | `/api/ai/recommendations` | Item-based collaborative filtering across the product catalog |
