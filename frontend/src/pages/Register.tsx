@@ -38,6 +38,7 @@ const Register: React.FC = () => {
   const [agreedToTerms, setAgreedToTerms] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -139,50 +140,69 @@ const Register: React.FC = () => {
         {/* Google SSO Button */}
         <button
           type="button"
+          disabled={googleLoading || loading}
           onClick={async () => {
-            if (isFirebaseConfigured()) {
-              try {
-                const result = await signInWithPopup(auth, googleProvider);
-                const fbUser = result.user;
-                const idToken = await fbUser.getIdToken();
-                await loginWithGoogle({
-                  email: fbUser.email || undefined,
-                  name: fbUser.displayName || undefined,
-                  googleId: fbUser.uid,
-                  idToken,
-                });
-                navigate('/dashboard');
-              } catch (err: any) {
-                console.error('Firebase Google sign-up error:', err);
-                if (err.code !== 'auth/popup-closed-by-user') {
-                  navigate('/login');
-                }
+            if (!isFirebaseConfigured()) {
+              setError('Google sign-in is not configured yet.');
+              return;
+            }
+            setGoogleLoading(true);
+            setError('');
+            try {
+              const result = await signInWithPopup(auth, googleProvider);
+              const fbUser = result.user;
+              const idToken = await fbUser.getIdToken();
+              await loginWithGoogle({
+                email: fbUser.email || undefined,
+                name: fbUser.displayName || undefined,
+                googleId: fbUser.uid,
+                idToken,
+              });
+              // Don't clear loading — keep spinner until navigation
+              navigate('/dashboard');
+            } catch (err: any) {
+              console.error('Google sign-up error:', err);
+              setGoogleLoading(false);
+              if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+                return; // Silently ignore — user deliberately closed popup
               }
-            } else {
-              navigate('/login');
+              if (err.code === 'auth/unauthorized-domain') {
+                setError('⚠️ Add "localhost" to Firebase Console → Authentication → Settings → Authorized Domains.');
+                return;
+              }
+              if (err.code === 'auth/popup-blocked') {
+                setError('Popup was blocked. Please allow popups for this site and try again.');
+                return;
+              }
+              const backendMsg = err?.response?.data?.message;
+              setError(backendMsg || err.message || 'Google sign-in failed. Please try again.');
             }
           }}
-          className="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 transition active:scale-95 shadow-sm cursor-pointer"
+          className="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 transition active:scale-95 shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-            <path
-              fill="#EA4335"
-              d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
-            />
-            <path
-              fill="#4285F4"
-              d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.5s.7 4.8 1.9 7.2l3.7-2.9z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"
-            />
-          </svg>
-          <span>Continue with Google</span>
+          {googleLoading ? (
+            <span className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin shrink-0" />
+          ) : (
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+              <path
+                fill="#EA4335"
+                d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
+              />
+              <path
+                fill="#4285F4"
+                d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.5s.7 4.8 1.9 7.2l3.7-2.9z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"
+              />
+            </svg>
+          )}
+          <span>{googleLoading ? 'Opening Google…' : 'Continue with Google'}</span>
         </button>
 
         <div className="flex items-center gap-2 my-2">

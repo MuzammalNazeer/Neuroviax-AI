@@ -7,6 +7,7 @@ const {
   createPayment,
   markPaymentCompleted,
   cashFlowSnapshot,
+  cashFlowPrediction,
   verifyAccount,
   createStripeCheckoutSession,
   verifyStripePayment,
@@ -16,6 +17,7 @@ router.use(protect, requireBusinessContext);
 
 router.get('/', listPayments);
 router.get('/cash-flow', cashFlowSnapshot);
+router.get('/cash-flow-prediction', cashFlowPrediction);
 router.post('/verify-account', verifyAccount);
 router.post('/create-stripe-checkout', createStripeCheckoutSession);
 router.post('/verify-stripe-payment', verifyStripePayment);

@@ -1,6 +1,8 @@
 const asyncHandler = require('../utils/asyncHandler');
 const Payment = require('../models/Payment');
+const Expense = require('../models/Expense');
 const { logAction } = require('../utils/audit');
+const { ensembleForecast } = require('../utils/cashFlowPredictionEngine');
 
 const listPayments = asyncHandler(async (req, res) => {
   const payments = await Payment.find({ business: req.businessId }).populate('order').sort({ createdAt: -1 });
@@ -92,6 +94,25 @@ const cashFlowSnapshot = asyncHandler(async (req, res) => {
   const receivable = payments.filter((p) => p.direction === 'receivable').reduce((s, p) => s + p.amount, 0);
   const payable = payments.filter((p) => p.direction === 'payable').reduce((s, p) => s + p.amount, 0);
   res.json({ receivable, payable, netPosition: receivable - payable });
+});
+
+// @desc  XGBoost/LightGBM Cash-Flow Prediction (7d / 14d / 30d / 90d)
+// @route GET /api/payments/cash-flow-prediction
+const cashFlowPrediction = asyncHandler(async (req, res) => {
+  const { horizon = 90 } = req.query;
+  const maxHorizon = Math.min(Math.max(Number(horizon) || 90, 7), 90);
+
+  // Fetch 90-day history
+  const since = new Date();
+  since.setDate(since.getDate() - 90);
+
+  const [payments, expenses] = await Promise.all([
+    Payment.find({ business: req.businessId, createdAt: { $gte: since } }),
+    Expense.find({ business: req.businessId, createdAt: { $gte: since } }),
+  ]);
+
+  const forecast = await ensembleForecast(payments, expenses, maxHorizon);
+  res.json(forecast);
 });
 
 // @desc  Verify account title & KYC status before allowing payment (e.g. 1Link title fetch, JazzCash title lookup, Stripe card validation)
@@ -285,6 +306,7 @@ module.exports = {
   createPayment,
   markPaymentCompleted,
   cashFlowSnapshot,
+  cashFlowPrediction,
   verifyAccount,
   createStripeCheckoutSession,
   verifyStripePayment,

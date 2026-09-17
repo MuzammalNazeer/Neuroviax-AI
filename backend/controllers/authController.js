@@ -529,7 +529,7 @@ const googleLogin = asyncHandler(async (req, res) => {
   let verifiedName = name;
   let verifiedGoogleId = googleId;
 
-  // If a Firebase / Google ID Token was passed, verify with Google tokeninfo
+  // ── 1. Verify Firebase / Google ID Token if provided ──────────────────────
   if (idToken) {
     try {
       const resp = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
@@ -539,46 +539,86 @@ const googleLogin = asyncHandler(async (req, res) => {
           verifiedEmail = tokenInfo.email;
           if (tokenInfo.name) verifiedName = tokenInfo.name;
           if (tokenInfo.sub) verifiedGoogleId = tokenInfo.sub;
+        } else {
+          // Token was valid JWT but Google returned no email — reject
+          return res.status(400).json({ message: 'Google token did not return an email address. Please try again.' });
+        }
+      } else {
+        const errBody = await resp.json().catch(() => ({}));
+        console.warn('[googleLogin] Google tokeninfo rejected:', errBody.error_description || resp.status);
+        // If token is bad and no email was passed in the body, reject cleanly
+        if (!email) {
+          return res.status(401).json({ message: 'Invalid or expired Google token. Please sign in again.' });
         }
       }
     } catch (err) {
-      console.warn('[Firebase Token Verify] Non-blocking warning:', err.message);
+      console.warn('[Firebase Token Verify] Network error:', err.message);
+      // Network issue — fall back to body email if present, else reject
+      if (!email) {
+        return res.status(503).json({ message: 'Could not verify Google token. Check your internet connection and try again.' });
+      }
     }
   }
 
-  const targetEmail = verifiedEmail || 'demo@neuroviax.ai';
-  const targetName = verifiedName || 'Google Verified User';
+  // ── 2. Require an email — never fall back to a hardcoded demo address ──────
+  if (!verifiedEmail) {
+    return res.status(400).json({ message: 'Email address is required for Google sign-in.' });
+  }
 
-  let user = await User.findOne({ email: targetEmail });
+  // ── 3. Find or create user ─────────────────────────────────────────────────
+  let user = await User.findOne({ email: verifiedEmail });
   let business = null;
 
   if (!user) {
+    // New Google user — create Business + Branch + User atomically
     business = await Business.create({
-      name: `${targetName}'s Enterprise`,
+      name: `${verifiedName || verifiedEmail.split('@')[0]}'s Workspace`,
       industry: 'technology',
       subscriptionPlan: 'growth',
     });
 
+    await Branch.create({
+      business: business._id,
+      name: 'Main Branch',
+      type: 'both',
+    });
+
     user = await User.create({
-      name: targetName,
-      email: targetEmail,
-      password: await bcrypt.hash(`GoogleSSO_${Math.random()}`, 10),
+      name: verifiedName || verifiedEmail.split('@')[0],
+      email: verifiedEmail,
+      googleId: verifiedGoogleId,
+      password: await bcrypt.hash(`GoogleSSO_${Math.random()}_${Date.now()}`, 10),
       memberships: [{ business: business._id, role: 'owner' }],
       isActive: true,
       lastLoginAt: new Date(),
     });
+
     const { isMuzammalNazir } = require('../middleware/superAdmin');
     user.isSuperAdmin = isMuzammalNazir(user);
-    user.lastLoginAt = new Date();
-    if (targetName && (user.name === 'Google Verified User' || !user.name)) {
-      user.name = targetName;
-    }
     await user.save();
+  } else {
+    // Existing user — update login timestamp and googleId if not stored yet
+    user.lastLoginAt = new Date();
+    if (verifiedGoogleId && !user.googleId) {
+      user.googleId = verifiedGoogleId;
+    }
+    // Update display name if name changed
+    if (verifiedName && verifiedName !== 'Google Verified User' && (!user.name || user.name === 'Google Verified User')) {
+      user.name = verifiedName;
+    }
+    const { isMuzammalNazir } = require('../middleware/superAdmin');
+    user.isSuperAdmin = isMuzammalNazir(user);
+    await user.save();
+
+    // Resolve active business
     if (user.memberships?.[0]?.business) {
-      business = await Business.findById(user.memberships[0].business);
+      business = await Business.findById(
+        user.memberships[0].business?._id || user.memberships[0].business
+      );
     }
   }
 
+  // ── 4. Issue tokens ────────────────────────────────────────────────────────
   const accessToken  = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
 

@@ -75,7 +75,27 @@ app.get('/', (req, res) => {
     status: 'running',
     version: '1.0.0',
     message: 'Backend server is running successfully.',
-    health: '/api/health'
+    health: '/api/health',
+    api: '/api'
+  });
+});
+
+app.get('/api', (req, res) => {
+  res.json({
+    name: 'Neuroviax REST API',
+    status: 'online',
+    version: '1.0.0',
+    message: 'Neuroviax API root is active. Use specific resource endpoints below.',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      products: '/api/products',
+      inventory: '/api/inventory',
+      orders: '/api/orders',
+      ai: '/api/ai',
+      business: '/api/business',
+      admin: '/api/admin'
+    }
   });
 });
 

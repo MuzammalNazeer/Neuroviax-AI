@@ -38,6 +38,7 @@ import {
   X,
   ExternalLink,
   TrendingUp,
+  LineChart,
 } from 'lucide-react';
 import api from '../api/axios';
 
@@ -55,6 +56,7 @@ const ALL_NAV_ITEMS = [
   { to: '/subscription', label: 'Subscription', icon: Crown, group: 'admin', roles: ['owner', 'admin', 'manager', 'accountant', 'staff'] },
   { to: '/team', label: 'Team & Admin', icon: UserCog, group: 'admin', roles: ['owner', 'admin', 'manager'], badge: 'ADMIN' },
   { to: '/demand-forecasting', label: 'Demand Forecasting', icon: TrendingUp, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'ML' },
+  { to: '/cash-flow-prediction', label: 'Cash-Flow AI', icon: LineChart, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'XGB' },
   { to: '/recommendations', label: 'AI Recommendations', icon: Sparkles, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'AI' },
   { to: '/ai-assistants', label: 'AI Assistants', icon: Bot, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'NEW' },
 ];

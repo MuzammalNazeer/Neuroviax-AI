@@ -111,7 +111,7 @@ const Login: React.FC = () => {
 
   const handleSsoClick = async (provider: string) => {
     if (provider === 'Google') {
-      // 1. If Firebase Web API key is configured, trigger live Firebase Google popup
+      // Firebase is configured → always use real Google popup (never the fake modal)
       if (isFirebaseConfigured()) {
         setSsoLoading('Google');
         setError('');
@@ -128,34 +128,42 @@ const Login: React.FC = () => {
           });
 
           setSuccess(`Authenticated as ${fbUser.displayName || fbUser.email}! Redirecting…`);
+          // Don't clear ssoLoading here — keep spinner until navigation completes
           setTimeout(() => {
             navigate('/dashboard');
           }, 350);
-          return;
         } catch (err: any) {
           console.error('Firebase Google sign-in error:', err);
-          if (err.code === 'auth/popup-closed-by-user') {
-            setError('Google sign-in popup was closed.');
-            setSsoLoading(null);
+          setSsoLoading(null); // Only clear on error
+
+          if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+            setError('Google sign-in was cancelled. Please try again.');
             return;
           }
           if (err.code === 'auth/unauthorized-domain') {
-            setError('Domain localhost is not authorized in Firebase Console → Authentication → Settings → Authorized Domains.');
-            setSsoLoading(null);
+            setError(
+              '⚠️ localhost is not in Firebase Authorized Domains. ' +
+              'Go to Firebase Console → Authentication → Settings → Authorized Domains → Add "localhost"'
+            );
             return;
           }
-          // If popup failed due to API key / domain / config, open Account Chooser modal
-          setShowGoogleModal(true);
-        } finally {
-          setSsoLoading(null);
+          if (err.code === 'auth/popup-blocked') {
+            setError('Popup was blocked by your browser. Please allow popups for this site and try again.');
+            return;
+          }
+          // Backend rejection (e.g. 400 from /api/auth/google)
+          const backendMsg = err?.response?.data?.message;
+          setError(backendMsg || err.message || 'Google sign-in failed. Please try again.');
         }
         return;
       }
 
-      // 2. If Firebase Web API key is not yet set in .env, open Account Chooser
+      // Firebase not configured → open dev Account Chooser as fallback
       setShowGoogleModal(true);
       return;
     }
+
+    // Other SSO providers (Microsoft etc.)
     setSsoLoading(provider);
     setError('');
     try {
@@ -192,13 +200,15 @@ const Login: React.FC = () => {
       setShowGoogleModal(false);
       setTimeout(() => navigate('/dashboard'), 350);
     } catch (err: any) {
-      console.error('Firebase error:', err);
-      if (err.code === 'auth/popup-closed-by-user') {
-        setError('Popup was closed. You can select an account below.');
+      console.error('Firebase popup error:', err);
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        setError('Popup was closed. You can select an account below or try again.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError('Add "localhost" to Firebase Console → Authentication → Settings → Authorized Domains.');
       } else {
-        setError(err.message || 'Firebase sign-in failed.');
+        const backendMsg = err?.response?.data?.message;
+        setError(backendMsg || err.message || 'Firebase sign-in failed. Please try again.');
       }
-    } finally {
       setSigningGoogleEmail(null);
     }
   };
