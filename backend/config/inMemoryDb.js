@@ -264,6 +264,10 @@ class InMemoryQuery {
     return this;
   }
 
+  lean() {
+    return this;
+  }
+
   async _exec() {
     let list = collections[this.modelName].filter((doc) => matchesFilter(doc, this.filter));
 

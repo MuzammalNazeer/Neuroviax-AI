@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import api from '../api/axios';
@@ -11,6 +12,7 @@ import {
   CheckCircle2,
   X,
   Search,
+  Sparkles,
 } from 'lucide-react';
 
 interface Customer {
@@ -77,19 +79,29 @@ const Customers: React.FC = () => {
           </p>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.03, y: -1 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowForm(!showForm)}
-          className={`text-xs font-bold px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2 ${
-            showForm
-              ? 'bg-slate-800 hover:bg-slate-900 text-white'
-              : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-700/20'
-          }`}
-        >
-          {showForm ? <X className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-          <span>{showForm ? 'Cancel' : 'Add New Customer'}</span>
-        </motion.button>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/customer-segmentation"
+            className="text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 bg-gradient-to-r from-purple-900/40 to-indigo-900/40 hover:from-purple-900/60 hover:to-indigo-900/60 text-purple-300 border border-purple-500/30 shadow-sm"
+          >
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            <span>AI Segmentation (K-Means)</span>
+          </Link>
+
+          <motion.button
+            whileHover={{ scale: 1.03, y: -1 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowForm(!showForm)}
+            className={`text-xs font-bold px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2 ${
+              showForm
+                ? 'bg-slate-800 hover:bg-slate-900 text-white'
+                : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-700/20'
+            }`}
+          >
+            {showForm ? <X className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+            <span>{showForm ? 'Cancel' : 'Add New Customer'}</span>
+          </motion.button>
+        </div>
       </div>
 
       {/* Drawer */}
