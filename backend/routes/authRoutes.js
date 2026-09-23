@@ -1,8 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, refresh, me, forgotPassword, verifyOTP, resetPassword, googleLogin, googleAuth, googleAuthCallback } = require('../controllers/authController');
+const {
+  register,
+  registerSendOTP,
+  login,
+  refresh,
+  me,
+  forgotPassword,
+  verifyOTP,
+  resetPassword,
+  googleLogin,
+  googleAuth,
+  googleAuthCallback,
+} = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 
+router.post('/register-send-otp', registerSendOTP);
 router.post('/register', register);
 router.post('/login', login);
 router.get('/google', googleAuth);

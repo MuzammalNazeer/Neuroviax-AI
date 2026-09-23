@@ -8,14 +8,12 @@ import {
   ArrowRight,
   AlertCircle,
   CheckCircle2,
-  KeyRound,
 } from 'lucide-react';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [devOTP, setDevOTP] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,8 +21,7 @@ const ForgotPassword: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/forgot-password', { email });
-      if (res.data._devOTP) setDevOTP(res.data._devOTP);
+      await api.post('/auth/forgot-password', { email });
       setSent(true);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');
@@ -127,27 +124,6 @@ const ForgotPassword: React.FC = () => {
                 </div>
               </div>
 
-              {/* Dev OTP Badge */}
-              {devOTP && (
-                <motion.div
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-amber-950/60 border border-amber-500/40 rounded-2xl p-4"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <KeyRound className="w-4 h-4 text-amber-400" />
-                    <span className="text-[11px] font-bold text-amber-300 uppercase tracking-widest">Dev Mode — OTP Preview</span>
-                  </div>
-                  <div className="bg-slate-900/80 rounded-xl p-3 text-center">
-                    <span className="text-3xl font-black font-mono tracking-[0.5em] text-amber-300">
-                      {devOTP}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-amber-600 mt-2 text-center">
-                    This badge only appears in development mode
-                  </p>
-                </motion.div>
-              )}
 
               <Link
                 to="/verify-otp"

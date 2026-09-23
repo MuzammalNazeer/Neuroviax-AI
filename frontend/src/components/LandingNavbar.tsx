@@ -91,6 +91,7 @@ export const LandingNavbar: React.FC = () => {
         {/* Action CTAs / User Auth */}
         <div className="hidden sm:flex items-center gap-3">
 
+
           {user ? (
             <button
               onClick={() => navigate('/dashboard')}
@@ -160,6 +161,7 @@ export const LandingNavbar: React.FC = () => {
             </div>
 
             <div className="pt-4 border-t border-slate-800/80 flex flex-col gap-2">
+
               {user ? (
                 <button
                   onClick={() => {

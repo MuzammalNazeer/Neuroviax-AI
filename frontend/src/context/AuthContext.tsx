@@ -14,8 +14,9 @@ interface AuthContextType {
     email: string,
     password: string,
     businessName: string,
+    otp?: string,
     autoLogin?: boolean
-  ) => Promise<void>;
+  ) => Promise<any>;
   logout: () => void;
   setActiveBusiness: (id: string) => void;
 }

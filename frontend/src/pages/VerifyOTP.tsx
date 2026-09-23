@@ -20,7 +20,10 @@ const OTP_LENGTH = 6;
 const VerifyOTP: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const email: string = (location.state as any)?.email || 'demo@neuroviax.ai';
+  const state = (location.state as any) || {};
+  const email: string = state.email || 'demo@neuroviax.ai';
+  const mode: 'signup' | 'reset-password' = state.mode || 'reset-password';
+  const signupData = state.signupData;
 
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [activeIdx, setActiveIdx] = useState(0);
@@ -29,7 +32,6 @@ const VerifyOTP: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [countdown, setCountdown] = useState(600); // 10 min
-  const [devOTP, setDevOTP] = useState<string | null>(null);
 
   // 3D & Laser states
   const [isLaserSweeping, setIsLaserSweeping] = useState(false);
@@ -224,9 +226,24 @@ const VerifyOTP: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/verify-otp', { email, otp });
-      playSound('fusion');
-      navigate('/reset-password', { state: { email, resetToken: res.data.resetToken } });
+      if (mode === 'signup') {
+        await api.post('/auth/register', {
+          ...(signupData || {}),
+          email,
+          otp,
+        });
+        playSound('fusion');
+        navigate('/login', {
+          state: {
+            registeredEmail: email,
+            message: 'Email verified and account registered successfully! Please sign in with your password.',
+          },
+        });
+      } else {
+        const res = await api.post('/auth/verify-otp', { email, otp });
+        playSound('fusion');
+        navigate('/reset-password', { state: { email, resetToken: res.data.resetToken } });
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid or expired OTP');
       triggerLaserSweep();
@@ -240,12 +257,22 @@ const VerifyOTP: React.FC = () => {
     setSuccess('');
     setResendLoading(true);
     try {
-      const res = await api.post('/auth/forgot-password', { email });
-      if (res.data._devOTP) setDevOTP(res.data._devOTP);
-      setCountdown(600);
-      setDigits(Array(OTP_LENGTH).fill(''));
-      setActiveIdx(0);
-      setSuccess('A new code has been sent to your email.');
+      if (mode === 'signup') {
+        await api.post('/auth/register-send-otp', {
+          name: signupData?.name,
+          email,
+        });
+        setCountdown(600);
+        setDigits(Array(OTP_LENGTH).fill(''));
+        setActiveIdx(0);
+        setSuccess('A new signup code has been sent to your email.');
+      } else {
+        await api.post('/auth/forgot-password', { email });
+        setCountdown(600);
+        setDigits(Array(OTP_LENGTH).fill(''));
+        setActiveIdx(0);
+        setSuccess('A new code has been sent to your email.');
+      }
       triggerDominoWave();
       inputRefs.current[0]?.focus();
     } catch (err: any) {
@@ -349,26 +376,7 @@ const VerifyOTP: React.FC = () => {
           <span>Expires in {formatTime(countdown)}</span>
         </div>
 
-        {/* Dev OTP Badge */}
-        <AnimatePresence>
-          {devOTP && (
-            <motion.div
-              key="dev-badge"
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="bg-amber-950/60 border border-amber-500/40 rounded-2xl p-3 text-center cursor-pointer hover:bg-amber-900/40 transition"
-              onClick={() => handleFillDevOTP(devOTP)}
-              title="Click to auto-fill"
-            >
-              <div className="flex items-center justify-center gap-1 text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1">
-                <Zap className="w-3 h-3" />
-                <span>Dev Mode — Tap to Auto-Fill</span>
-              </div>
-              <span className="text-2xl font-black font-mono tracking-[0.4em] text-amber-300">{devOTP}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 3D DOMINO STAGE */}

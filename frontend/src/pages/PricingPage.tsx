@@ -91,7 +91,7 @@ const TIERS = [
       'Multi-tenant franchise console & global telemetry',
       'Custom ERP & Oracle/SAP data migration',
       '99.99% Uptime SLA & 24/7 Phone Support',
-      'Custom Payment Gateway Connectors (JazzCash, Stripe, Razorpay)',
+      'Exclusive Stripe Card Payments & 3D Secure Checkout',
     ],
     popular: false,
     cta: 'Contact Enterprise Team',

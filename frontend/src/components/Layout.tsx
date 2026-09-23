@@ -232,6 +232,7 @@ const Layout: React.FC = () => {
                   </NavLink>
                 );
               })}
+
             </>
           )}
 
@@ -347,6 +348,7 @@ const Layout: React.FC = () => {
               <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
               <span>View Website</span>
             </a>
+
 
             {/* Notification Bell */}
             <div className="relative">

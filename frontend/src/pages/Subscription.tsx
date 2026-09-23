@@ -119,7 +119,7 @@ const STATIC_TIERS: TierInfo[] = [
       'WhatsApp order confirmation automation',
       'Procurement Assistant (Reorders & Supplier Comparison)',
       'Expense categorization & cash-flow snapshots',
-      'Regional gateways (JazzCash, Easypaisa, Stripe)',
+      'Exclusive Stripe Card Payments & 3D Secure Checkout',
     ],
     popular: true,
     gradient: 'from-emerald-600 to-teal-700',
@@ -186,8 +186,8 @@ const Subscription: React.FC = () => {
   
   // Modal & Action States
   const [modalTier, setModalTier] = useState<TierInfo | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'jazzcash' | 'easypaisa' | 'stripe' | 'bank_transfer'>('jazzcash');
-  const [accountNumber, setAccountNumber] = useState('03264414694');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe'>('stripe');
+  const [accountNumber, setAccountNumber] = useState('4242 4242 4242 4242');
   const [processing, setProcessing] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [cancelModal, setCancelModal] = useState(false);

@@ -342,15 +342,6 @@ const Landing: React.FC = () => {
                       <ArrowRight className="w-4 h-4" />
                     </motion.div>
                   </Link>
-                  <a href="http://localhost:5175" target="_blank" rel="noreferrer">
-                    <motion.div
-                      whileHover={{ scale: 1.04, y: -1 }}
-                      whileTap={{ scale: 0.97 }}
-                      className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-100 font-bold text-sm px-7 py-3.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer"
-                    >
-                      Open Admin Portal (5175)
-                    </motion.div>
-                  </a>
                 </>
               ) : (
                 <>

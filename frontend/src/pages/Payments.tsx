@@ -152,7 +152,7 @@ const Payments: React.FC = () => {
   const [form, setForm] = useState({
     direction: 'receivable' as 'receivable' | 'payable',
     amount: '',
-    method: 'cash',
+    method: 'stripe',
     accountIdentifier: '',
     orderId: '',
     notes: '',
@@ -331,7 +331,7 @@ const Payments: React.FC = () => {
       setForm({
         direction: 'receivable',
         amount: '',
-        method: 'cash',
+        method: 'stripe',
         accountIdentifier: '',
         orderId: '',
         notes: '',
@@ -384,11 +384,11 @@ const Payments: React.FC = () => {
             </span>
             <span>Payments & Settlement Gateway</span>
             <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-0.5 rounded-full font-bold">
-              Multi-Gateway Active
+              Stripe Exclusive Active
             </span>
           </h2>
           <p className="text-slate-500 text-xs mt-1">
-            Accept receivables and disburse payables via Stripe, JazzCash, Easypaisa, Razorpay, Bank Transfer, and Cash.
+            Accept receivables and disburse payables exclusively via Stripe (Global Cards, 3D Secure, & Instant Settlement).
           </p>
         </div>
 
@@ -507,18 +507,13 @@ const Payments: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Gateway / Channel *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Payment Gateway *</label>
                   <select
-                    value={form.method}
-                    onChange={(e) => setForm({ ...form, method: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs bg-slate-50/50 hover:bg-white focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none transition font-bold text-slate-800"
+                    value="stripe"
+                    disabled
+                    className="w-full border border-indigo-200 bg-indigo-50/70 rounded-xl px-3.5 py-2.5 text-xs font-bold text-indigo-900 cursor-not-allowed"
                   >
-                    <option value="cash">Cash Settlement</option>
-                    <option value="stripe">Stripe</option>
-                    <option value="jazzcash">JazzCash</option>
-                    <option value="easypaisa">Easypaisa</option>
-                    <option value="razorpay">Razorpay</option>
-                    <option value="bank_transfer">Wire / Bank Transfer</option>
+                    <option value="stripe">Stripe Global Card Payments (Exclusive Gateway)</option>
                   </select>
                 </div>
 

@@ -32,20 +32,22 @@ const adminAuth = asyncHandler(async (req, res, next) => {
       if (user && user.isActive) {
         if (!isMuzammalNazir(user)) {
           return res.status(403).json({
-            message: 'Access Denied: Super Admin console is strictly restricted to platform creator Muzammal Nazir.',
+            message: 'Access Denied: Super Admin console is strictly restricted to platform administrators.',
           });
         }
         req.user = user;
         return next();
       }
     } catch (err) {
-      // Graceful fallback to creator account below
+      // Graceful fallback to admin account below
     }
   }
 
-  // Local admin cockpit fallback: strictly resolve creator Muzammal Nazir
+  // Local admin cockpit fallback: resolve creator or platform admin
   const superAdmin =
     (await User.findOne({ email: 'nazeermuzammal174@gmail.com' })) ||
+    (await User.findOne({ email: 'admin@neuroviax.ai' })) ||
+    (await User.findOne({ isSuperAdmin: true })) ||
     (await User.findOne({ email: 'nazirmuzammal281@gmail.com' })) ||
     (await User.findOne({ email: 'nazeermuzammal1744@gmail.com' })) ||
     (await User.findOne({ email: 'nazirmuzammal28@gmail.com' }));
@@ -55,7 +57,7 @@ const adminAuth = asyncHandler(async (req, res, next) => {
     return next();
   }
 
-  return res.status(401).json({ message: 'Authentication required for Super Admin Muzammal Nazir' });
+  return res.status(401).json({ message: 'Authentication required for Super Admin' });
 });
 
 router.use(adminAuth);

@@ -37,6 +37,7 @@ import {
   LogIn,
   ChevronRight,
   ShieldAlert,
+  ExternalLink,
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuthStore, isUserSuperAdmin } from '../store/useAuthStore';
@@ -367,7 +368,7 @@ const AdminDashboard: React.FC = () => {
     return { x, y };
   };
 
-  // Strict creator security guard: ONLY Muzammal Nazir has full control; all others are denied
+  // Platform Super Admin access check
   if (currentUser && !isUserSuperAdmin(currentUser)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 text-white font-sans antialiased">
@@ -375,23 +376,32 @@ const AdminDashboard: React.FC = () => {
           <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto">
             <ShieldAlert className="w-8 h-8 text-rose-400" />
           </div>
-          <h2 className="text-2xl font-black text-white font-display">Access Denied</h2>
+          <h2 className="text-2xl font-black text-white font-display">Super Admin Privileges Required</h2>
           <p className="text-xs text-slate-400 leading-relaxed">
-            The Neuroviax Decision Cockpit & Super Admin Console is strictly restricted to platform creator <strong className="text-white">Muzammal Nazir</strong>.
+            The Neuroviax Decision Cockpit (Port 5175) is reserved for Platform Administrators.
           </p>
           <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-left space-y-1">
             <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase">
-              <span>Attempted Account</span>
-              <span className="text-rose-400 font-bold">Unauthorized</span>
+              <span>Current Logged Account</span>
+              <span className="text-amber-400 font-bold">Standard Role</span>
             </div>
             <p className="text-xs font-mono text-slate-300 truncate">{currentUser.email}</p>
           </div>
-          <div className="pt-2">
-            <a
-              href="http://localhost:5173"
-              className="inline-block w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-md shadow-blue-600/20"
+          <div className="pt-2 flex flex-col gap-2.5">
+            <button
+              onClick={() => {
+                logout();
+                window.location.href = '/login';
+              }}
+              className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition cursor-pointer"
             >
-              Return to Main Application (Port 5173)
+              Sign In with Super Admin Credentials
+            </button>
+            <a
+              href="http://localhost:5174"
+              className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold text-xs transition"
+            >
+              Return to Website / Main ERP (Port 5174)
             </a>
           </div>
         </div>
@@ -467,8 +477,20 @@ const AdminDashboard: React.FC = () => {
             </button>
           </nav>
 
-          {/* Right Controls: Search & Founder Badge */}
+          {/* Right Controls: Search, Website Link & Founder Badge */}
           <div className="flex items-center gap-3">
+            {/* Direct Switch to Port 5174 ERP / Website */}
+            <a
+              href="http://localhost:5174"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition"
+              title="Open Website / ERP Platform on Port 5174"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
+              <span>ERP & Website (Port 5174)</span>
+            </a>
+
             {/* Search Icon Circle Button */}
             <button
               onClick={() => setShowSearchModal(true)}
@@ -1028,18 +1050,18 @@ const AdminDashboard: React.FC = () => {
                     <div key={rec._id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${rec.riskTier === 'high' ? 'bg-rose-100 text-rose-800' : 'bg-blue-100 text-blue-800'
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${(rec.riskTier || 'medium') === 'high' ? 'bg-rose-100 text-rose-800' : 'bg-blue-100 text-blue-800'
                             }`}>
-                            {rec.riskTier} RISK
+                            {(rec.riskTier || 'medium').toUpperCase()} RISK
                           </span>
                           <span className="font-bold text-slate-800 capitalize">
-                            {rec.assistant} Engine — {rec.action.replace('_', ' ')}
+                            {rec.assistant || 'AI'} Engine — {(rec.action || 'recommendation').replace(/_/g, ' ')}
                           </span>
                           <span className="text-[11px] text-emerald-600 font-semibold">
                             Confidence: {Math.round((rec.confidenceScore || 0.8) * 100)}%
                           </span>
                         </div>
-                        <p className="text-slate-600 text-xs leading-relaxed">{rec.rationale}</p>
+                        <p className="text-slate-600 text-xs leading-relaxed">{rec.rationale || 'System-evaluated autonomous action.'}</p>
                       </div>
 
                       <div className="shrink-0 flex items-center gap-2">

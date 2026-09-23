@@ -132,12 +132,11 @@ const AdminAuth: React.FC = () => {
             <span>Port 5175 Admin Gate</span>
           </span>
           <a
-            href="http://localhost:5173"
+            href="http://localhost:5174"
             target="_blank"
-            rel="noreferrer"
-            className="text-xs font-bold text-blue-600 hover:text-blue-800 transition px-3 py-1.5 rounded-full hover:bg-blue-50"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
           >
-            Go to Website (5173) &rarr;
+            Go to Website (5174) &rarr;
           </a>
         </div>
       </header>

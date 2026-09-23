@@ -32,12 +32,19 @@ export interface User {
 
 const SUPER_ADMIN_EMAILS = [
   'nazeermuzammal174@gmail.com',
+  'admin@neuroviax.ai',
+  'nazirmuzammal281@gmail.com',
+  'nazeermuzammal1744@gmail.com',
+  'nazirmuzammal28@gmail.com',
 ];
 
 export const isUserSuperAdmin = (user: User | null): boolean => {
   if (!user) return false;
+  if (user.isSuperAdmin === true) return true;
+  const role = (user.role || '').toLowerCase();
+  if (role === 'super_admin' || role === 'superadmin' || role === 'admin') return true;
   const email = (user.email || '').toLowerCase().trim();
-  return email === 'nazeermuzammal174@gmail.com';
+  return SUPER_ADMIN_EMAILS.includes(email);
 };
 
 interface AuthState {
@@ -52,13 +59,15 @@ interface AuthState {
   // Actions
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (payload?: { email?: string; name?: string; googleId?: string; idToken?: string }) => Promise<void>;
+  sendSignupOTP: (name: string, email: string) => Promise<{ message: string; _devOTP?: string }>;
   register: (
     name: string,
     email: string,
     password: string,
     businessName: string,
+    otp?: string,
     autoLogin?: boolean
-  ) => Promise<void>;
+  ) => Promise<any>;
   logout: () => void;
   setTokens: (accessToken: string, refreshToken?: string) => void;
   setUser: (user: User) => void;
@@ -181,12 +190,30 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      sendSignupOTP: async (name: string, email: string) => {
+        set({ loading: true, error: null });
+        try {
+          const { data } = await axios.post(`${API_BASE_URL}/auth/register-send-otp`, {
+            name,
+            email,
+          });
+          set({ loading: false });
+          return data;
+        } catch (err: any) {
+          const msg =
+            err.response?.data?.message || 'Failed to dispatch verification code. Please check your email.';
+          set({ error: msg, loading: false });
+          throw err;
+        }
+      },
+
       register: async (
         name: string,
         email: string,
         password: string,
         businessName: string,
-        autoLogin = false
+        otp?: string,
+        autoLogin = true
       ) => {
         set({ loading: true, error: null });
         try {
@@ -195,6 +222,7 @@ export const useAuthStore = create<AuthState>()(
             email,
             password,
             businessName,
+            otp,
           });
 
           if (autoLogin) {
@@ -202,7 +230,7 @@ export const useAuthStore = create<AuthState>()(
             const bizId = business?._id?.toString() || null;
 
             localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken);
+            if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('user', JSON.stringify(user));
             if (user?.email) localStorage.setItem('lastEmail', user.email);
             if (bizId) localStorage.setItem('businessId', bizId);
@@ -219,9 +247,10 @@ export const useAuthStore = create<AuthState>()(
           } else {
             set({ loading: false });
           }
+          return data;
         } catch (err: any) {
           const msg =
-            err.response?.data?.message || 'Registration failed. Please try again.';
+            err.response?.data?.message || 'Registration failed. Please check your inputs.';
           set({ error: msg, loading: false });
           throw err;
         }

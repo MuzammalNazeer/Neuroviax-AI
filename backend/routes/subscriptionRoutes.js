@@ -10,6 +10,7 @@ const {
   createPortalSession,
   getAdminAnalytics,
   devActivatePlan,
+  devActivatePlan: changePlan,
 } = require('../controllers/subscriptionController');
 
 // Public route to view plan specs & pricing
@@ -27,5 +28,6 @@ router.get('/admin/analytics', getAdminAnalytics);
 
 // Dev / test simulation helper
 router.post('/dev-activate', devActivatePlan);
+router.post('/change-plan', devActivatePlan);
 
 module.exports = router;

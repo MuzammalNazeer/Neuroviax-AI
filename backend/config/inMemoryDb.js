@@ -19,6 +19,7 @@ const Report = require('../models/Report');
 const Integration = require('../models/Integration');
 const SubscriptionPlan = require('../models/SubscriptionPlan');
 const Subscription = require('../models/Subscription');
+const OtpVerification = require('../models/OtpVerification');
 
 const models = {
   User,
@@ -38,6 +39,7 @@ const models = {
   Integration,
   SubscriptionPlan,
   Subscription,
+  OtpVerification,
 };
 
 const collections = {};
@@ -479,7 +481,7 @@ async function seedDemoData() {
   user.memberships.push({ business: business._id, role: 'owner' });
   await user.save();
 
-  // Seed Super Admin: Muzammal Nazeer (Strict exclusive platform owner)
+  // Seed Super Admin: Muzammal Nazeer (Platform creator)
   const SUPER_ADMIN_ID = new mongoose.Types.ObjectId('111111111111111111111111');
   const superAdmin = await models.User.create({
     _id: SUPER_ADMIN_ID,
@@ -490,6 +492,19 @@ async function seedDemoData() {
     isActive: true,
     lastLoginAt: new Date(),
     memberships: [{ business: business._id, role: 'owner' }],
+  });
+
+  // Seed Admin Operator: admin@neuroviax.ai
+  const ADMIN_OPERATOR_ID = new mongoose.Types.ObjectId('111111111111111111111112');
+  await models.User.create({
+    _id: ADMIN_OPERATOR_ID,
+    name: 'Admin Operator',
+    email: 'admin@neuroviax.ai',
+    password: 'Password123!',
+    isSuperAdmin: true,
+    isActive: true,
+    lastLoginAt: new Date(),
+    memberships: [{ business: business._id, role: 'admin' }],
   });
 
   // Seed sample platform users so Super Admin has rich signups to inspect immediately

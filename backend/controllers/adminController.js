@@ -338,7 +338,16 @@ const getCockpitData = asyncHandler(async (req, res) => {
     monthLabels,
     series,
     totalRecommendations: recommendations.length,
-    activeRecommendations: recommendations.slice(0, 10),
+    activeRecommendations: recommendations.slice(0, 10).map((r) => {
+      const obj = r.toObject ? r.toObject() : { ...r };
+      return {
+        ...obj,
+        assistant: obj.assistant || 'operations',
+        riskTier: obj.riskTier || obj.priority || 'medium',
+        action: obj.action || obj.title || 'autonomous_decision',
+        rationale: obj.rationale || obj.description || 'System-evaluated autonomous action.',
+      };
+    }),
   });
 });
 
