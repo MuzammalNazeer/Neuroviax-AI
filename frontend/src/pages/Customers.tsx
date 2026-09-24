@@ -9,10 +9,14 @@ import {
   Phone,
   Mail,
   MessageSquare,
+  MessageSquareOff,
   CheckCircle2,
+  Check,
   X,
   Search,
   Sparkles,
+  Send,
+  RotateCcw,
 } from 'lucide-react';
 
 interface Customer {
@@ -29,6 +33,8 @@ const Customers: React.FC = () => {
   const [form, setForm] = useState({ name: '', phone: '', email: '', whatsappOptIn: false });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -36,6 +42,64 @@ const Customers: React.FC = () => {
   };
 
   useEffect(load, []);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleToggleWhatsApp = async (customer: Customer) => {
+    setUpdatingId(customer._id);
+    const newStatus = !customer.whatsappOptIn;
+    // Optimistic update
+    setCustomers((prev) =>
+      prev.map((c) => (c._id === customer._id ? { ...c, whatsappOptIn: newStatus } : c))
+    );
+
+    try {
+      await api.patch(`/customers/${customer._id}/toggle-whatsapp`, { whatsappOptIn: newStatus });
+      showToast(`WhatsApp Opt-In ${newStatus ? 'enabled' : 'disabled'} for ${customer.name}`);
+    } catch (err) {
+      // Fallback to PUT
+      try {
+        await api.put(`/customers/${customer._id}`, { whatsappOptIn: newStatus });
+        showToast(`WhatsApp Opt-In ${newStatus ? 'enabled' : 'disabled'} for ${customer.name}`);
+      } catch (err2) {
+        // Revert on error
+        setCustomers((prev) =>
+          prev.map((c) => (c._id === customer._id ? { ...c, whatsappOptIn: !newStatus } : c))
+        );
+        showToast(`Failed to update WhatsApp opt-in for ${customer.name}`);
+      }
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleResetOptIn = async (customer: Customer) => {
+    setUpdatingId(customer._id);
+    // Optimistic update
+    setCustomers((prev) =>
+      prev.map((c) => (c._id === customer._id ? { ...c, whatsappOptIn: false } : c))
+    );
+
+    try {
+      await api.patch(`/customers/${customer._id}/toggle-whatsapp`, { whatsappOptIn: false });
+      showToast(`WhatsApp Opt-In reset to Disabled for ${customer.name}`);
+    } catch (err) {
+      try {
+        await api.put(`/customers/${customer._id}`, { whatsappOptIn: false });
+        showToast(`WhatsApp Opt-In reset to Disabled for ${customer.name}`);
+      } catch (err2) {
+        setCustomers((prev) =>
+          prev.map((c) => (c._id === customer._id ? { ...c, whatsappOptIn: true } : c))
+        );
+        showToast(`Failed to reset WhatsApp opt-in for ${customer.name}`);
+      }
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,6 +263,21 @@ const Customers: React.FC = () => {
         </span>
       </div>
 
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs"
+          >
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Customers Table */}
       <div className="glass-card rounded-2xl shadow-elevated overflow-hidden border border-slate-200/80">
         <div className="overflow-x-auto">
@@ -208,7 +287,14 @@ const Customers: React.FC = () => {
                 <th className="px-6 py-3.5">Customer Name</th>
                 <th className="px-6 py-3.5">Contact Phone</th>
                 <th className="px-6 py-3.5">Email Address</th>
-                <th className="px-6 py-3.5">WhatsApp Opt-In</th>
+                <th className="px-6 py-3.5">
+                  <div className="flex items-center gap-1.5">
+                    <span>WhatsApp Opt-In</span>
+                    <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-1.5 py-0.2 rounded-full lowercase">
+                      {customers.filter((c) => c.whatsappOptIn).length} enabled
+                    </span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -253,14 +339,60 @@ const Customers: React.FC = () => {
                     {c.email || '—'}
                   </td>
                   <td className="px-6 py-4">
-                    {c.whatsappOptIn ? (
-                      <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                        <MessageSquare className="w-3 h-3 text-emerald-600" />
-                        <span>Enabled</span>
-                      </span>
-                    ) : (
-                      <span className="text-slate-400 text-xs">—</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {/* Interactive WhatsApp Opt-In Toggle Pill */}
+                      <button
+                        onClick={() => handleToggleWhatsApp(c)}
+                        disabled={updatingId === c._id}
+                        className={`group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none border shadow-xs ${
+                          c.whatsappOptIn
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400'
+                            : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200/80 hover:text-slate-800'
+                        } ${updatingId === c._id ? 'opacity-60 cursor-wait' : ''}`}
+                        title={`Click to ${c.whatsappOptIn ? 'Disable / Reset' : 'Enable'} WhatsApp Opt-In for ${c.name}`}
+                      >
+                        {updatingId === c._id ? (
+                          <span className="w-3.5 h-3.5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                        ) : c.whatsappOptIn ? (
+                          <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                        ) : (
+                          <MessageSquareOff className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600" />
+                        )}
+                        <span>{c.whatsappOptIn ? 'Enabled' : 'Disabled'}</span>
+                        <span className="text-[9px] uppercase tracking-wider text-slate-400 group-hover:text-slate-600 font-semibold ml-0.5">
+                          (Toggle)
+                        </span>
+                      </button>
+
+                      {/* Direct WhatsApp Chat Action Button */}
+                      {c.phone && (
+                        <a
+                          href={`https://wa.me/${c.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(c.name)}!%20Your%20order%20updates%20are%20active.`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`p-1.5 rounded-lg border transition ${
+                            c.whatsappOptIn
+                              ? 'bg-emerald-500/10 text-emerald-700 border-emerald-200 hover:bg-emerald-500 hover:text-white shadow-xs'
+                              : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-200 hover:text-slate-600 opacity-60'
+                          }`}
+                          title={`Open WhatsApp chat with ${c.name} (${c.phone})`}
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+
+                      {/* Reset Opt-In to Disabled Button (only when enabled) */}
+                      {c.whatsappOptIn && (
+                        <button
+                          onClick={() => handleResetOptIn(c)}
+                          disabled={updatingId === c._id}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition border border-transparent hover:border-rose-200 cursor-pointer"
+                          title={`Reset WhatsApp Opt-In to Disabled for ${c.name}`}
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </motion.tr>
               ))}
