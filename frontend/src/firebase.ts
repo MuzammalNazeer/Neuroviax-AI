@@ -9,6 +9,7 @@ import {
   updateProfile,
   signOut,
 } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDu6hNhV1dJ1hhGhHMCpREH8BYR_VzdJ6w',
@@ -22,11 +23,13 @@ const firebaseConfig = {
 
 let app: any = null;
 let auth: any = null;
+let db: any = null;
 let googleProvider: any = null;
 
 try {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
   auth = getAuth(app);
+  db = getFirestore(app);
   googleProvider = new GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: 'select_account' });
 } catch (err) {
@@ -60,6 +63,7 @@ export const firebasePasswordReset = async (email: string) => {
 export {
   app,
   auth,
+  db,
   googleProvider,
   signInWithPopup,
   GoogleAuthProvider,
