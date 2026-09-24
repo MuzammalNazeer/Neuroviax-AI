@@ -452,6 +452,99 @@ function patchModel(modelName, ModelClass) {
   ModelClass.findByIdAndUpdate = async function (id, update, options = {}) {
     return ModelClass.findOneAndUpdate({ _id: id }, update, options);
   };
+
+  ModelClass.updateMany = async function (filter, update, options = {}) {
+    const docs = collections[modelName].filter((d) => matchesFilter(d, filter));
+    let modifiedCount = 0;
+
+    for (const doc of docs) {
+      if (update.$set) {
+        Object.assign(doc, update.$set);
+      }
+      if (update.$inc) {
+        for (const [k, v] of Object.entries(update.$inc)) {
+          doc[k] = (Number(doc[k]) || 0) + Number(v);
+        }
+      }
+      if (update.$push) {
+        for (const [k, v] of Object.entries(update.$push)) {
+          if (!Array.isArray(doc[k])) doc[k] = [];
+          doc[k].push(v);
+        }
+      }
+      for (const [k, v] of Object.entries(update)) {
+        if (!k.startsWith('$')) {
+          doc[k] = v;
+        }
+      }
+      doc.updatedAt = new Date();
+      modifiedCount++;
+    }
+
+    if (modifiedCount > 0) {
+      saveStore();
+    }
+
+    return {
+      acknowledged: true,
+      matchedCount: docs.length,
+      modifiedCount,
+    };
+  };
+
+  ModelClass.updateOne = async function (filter, update, options = {}) {
+    const doc = collections[modelName].find((d) => matchesFilter(d, filter));
+    if (!doc) {
+      if (options.upsert) {
+        const created = await ModelClass.create({ ...filter, ...update });
+        return { acknowledged: true, matchedCount: 0, modifiedCount: 0, upsertedId: created._id };
+      }
+      return { acknowledged: true, matchedCount: 0, modifiedCount: 0 };
+    }
+
+    if (update.$set) {
+      Object.assign(doc, update.$set);
+    }
+    if (update.$inc) {
+      for (const [k, v] of Object.entries(update.$inc)) {
+        doc[k] = (Number(doc[k]) || 0) + Number(v);
+      }
+    }
+    if (update.$push) {
+      for (const [k, v] of Object.entries(update.$push)) {
+        if (!Array.isArray(doc[k])) doc[k] = [];
+        doc[k].push(v);
+      }
+    }
+    for (const [k, v] of Object.entries(update)) {
+      if (!k.startsWith('$')) {
+        doc[k] = v;
+      }
+    }
+    doc.updatedAt = new Date();
+    saveStore();
+    return { acknowledged: true, matchedCount: 1, modifiedCount: 1 };
+  };
+
+  ModelClass.deleteOne = async function (filter) {
+    const index = collections[modelName].findIndex((d) => matchesFilter(d, filter));
+    if (index !== -1) {
+      collections[modelName].splice(index, 1);
+      saveStore();
+      return { acknowledged: true, deletedCount: 1 };
+    }
+    return { acknowledged: true, deletedCount: 0 };
+  };
+
+  ModelClass.findByIdAndDelete = async function (id) {
+    const index = collections[modelName].findIndex((d) => (d._id != null ? d._id.toString() : '') === (id != null ? id.toString() : ''));
+    if (index !== -1) {
+      const removed = collections[modelName].splice(index, 1)[0];
+      saveStore();
+      return removed;
+    }
+    return null;
+  };
 }
 
 // Fixed IDs so JWT tokens survive server restarts (no "user not found" on reload)

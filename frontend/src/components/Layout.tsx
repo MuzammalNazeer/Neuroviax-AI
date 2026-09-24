@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import SEO from './SEO';
@@ -28,6 +28,7 @@ import {
   Plug,
   DollarSign,
   MessageCircle,
+  Check,
   CheckCheck,
   Home,
   Info,
@@ -74,11 +75,14 @@ const ROLE_STYLES: Record<string, { label: string; badge: string; icon: React.Co
 const Layout: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [notifications, setNotifications] = React.useState<any[]>([]);
   const [unreadCount, setUnreadCount] = React.useState(0);
   const [showNotifs, setShowNotifs] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [isMarkingAllRead, setIsMarkingAllRead] = React.useState(false);
+  const notifRef = React.useRef<HTMLDivElement>(null);
 
   const fetchNotifications = async () => {
     try {
@@ -92,17 +96,126 @@ const Layout: React.FC = () => {
 
   React.useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 20000);
+    const interval = setInterval(fetchNotifications, 15000);
     return () => clearInterval(interval);
   }, []);
 
+  // Close notifications dropdown on click outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifs(false);
+      }
+    };
+    if (showNotifs) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifs]);
+
   const handleMarkAllRead = async () => {
+    setIsMarkingAllRead(true);
     try {
       await api.patch('/notifications/read-all');
       setUnreadCount(0);
       setNotifications((prev) => prev.map((n) => ({ ...n, status: 'read' })));
     } catch (err) {
-      console.error(err);
+      console.error('Failed to mark all notifications as read:', err);
+    } finally {
+      setIsMarkingAllRead(false);
+    }
+  };
+
+  const handleMarkSingleRead = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    try {
+      await api.patch(`/notifications/${id}/read`);
+      setNotifications((prev) =>
+        prev.map((item) => (item._id === id ? { ...item, status: 'read' } : item))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err);
+    }
+  };
+
+  const getNotificationRoute = (n: any): string => {
+    if (n.metadata?.route) return n.metadata.route;
+    if (n.metadata?.link) return n.metadata.link;
+    const text = `${n.title || ''} ${n.message || ''}`.toLowerCase();
+    if (
+      text.includes('iforest') ||
+      text.includes('anomaly') ||
+      text.includes('shrinkage') ||
+      text.includes('off-hours') ||
+      text.includes('flagged') ||
+      text.includes('mismatch')
+    ) {
+      return '/anomaly-detection';
+    }
+    if (
+      text.includes('campaign') ||
+      text.includes('segment') ||
+      text.includes('dormant') ||
+      text.includes('customer segment')
+    ) {
+      return '/customer-segmentation';
+    }
+    if (text.includes('payment') || text.includes('invoice') || text.includes('payout')) {
+      return '/payments';
+    }
+    if (text.includes('inventory') || text.includes('stock') || text.includes('reorder')) {
+      return '/inventory';
+    }
+    if (text.includes('order')) {
+      return '/orders';
+    }
+    if (text.includes('cash flow') || text.includes('cash-flow')) {
+      return '/cash-flow-prediction';
+    }
+    if (text.includes('demand') || text.includes('forecast')) {
+      return '/demand-forecasting';
+    }
+    if (text.includes('recommendation') || text.includes('advisory')) {
+      return '/recommendations';
+    }
+    if (text.includes('expense')) {
+      return '/expenses';
+    }
+    return '/dashboard';
+  };
+
+  const handleNotificationClick = async (n: any) => {
+    if (n.status === 'unread') {
+      try {
+        await api.patch(`/notifications/${n._id}/read`);
+        setNotifications((prev) =>
+          prev.map((item) => (item._id === n._id ? { ...item, status: 'read' } : item))
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    setShowNotifs(false);
+    const targetRoute = getNotificationRoute(n);
+    if (targetRoute) {
+      navigate(targetRoute);
+    }
+  };
+
+  const formatTimeAgo = (dateStr?: string) => {
+    if (!dateStr) return '';
+    try {
+      const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+      if (diff < 60) return 'Just now';
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return `${Math.floor(diff / 86400)}d ago`;
+    } catch {
+      return '';
     }
   };
 
@@ -350,16 +463,20 @@ const Layout: React.FC = () => {
             </a>
 
 
-            {/* Notification Bell */}
-            <div className="relative">
+            {/* Notification Bell & Dropdown */}
+            <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setShowNotifs(!showNotifs)}
-                className="relative p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                className={`relative p-2 rounded-xl transition-all cursor-pointer ${
+                  showNotifs
+                    ? 'bg-emerald-50 text-emerald-700 ring-2 ring-emerald-500/20 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                }`}
                 title="Notifications Center (In-App & WhatsApp)"
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse">
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse shadow-sm">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -372,60 +489,128 @@ const Layout: React.FC = () => {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 text-xs"
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-84 sm:w-[420px] bg-white rounded-2xl shadow-2xl border border-slate-200/90 overflow-hidden z-50 text-xs"
                   >
-                    <div className="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                    {/* Header */}
+                    <div className="p-3.5 bg-gradient-to-r from-slate-50 to-slate-100/60 border-b border-slate-200/80 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Bell className="w-4 h-4 text-emerald-600" />
-                        <span className="font-bold text-slate-800">Notifications</span>
-                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-1.5 py-0.2 rounded-full">
-                          {unreadCount} new
-                        </span>
+                        <div className="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-xs">
+                          <Bell className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <span className="font-bold text-slate-800 text-xs block leading-tight">Notifications</span>
+                          <span className="text-[10px] text-slate-400 block leading-tight">Real-time alerts & updates</span>
+                        </div>
+                        {unreadCount > 0 ? (
+                          <span className="bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full ml-1">
+                            {unreadCount} new
+                          </span>
+                        ) : (
+                          <span className="bg-slate-200/70 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-full ml-1">
+                            All read
+                          </span>
+                        )}
                       </div>
+
                       {unreadCount > 0 && (
                         <button
                           onClick={handleMarkAllRead}
-                          className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:text-emerald-700"
+                          disabled={isMarkingAllRead}
+                          className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 hover:text-emerald-800 bg-white hover:bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80 shadow-xs transition cursor-pointer disabled:opacity-60"
                         >
-                          <CheckCheck className="w-3.5 h-3.5" />
-                          <span>Mark all read</span>
+                          <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{isMarkingAllRead ? 'Updating...' : 'Mark all read'}</span>
                         </button>
                       )}
                     </div>
 
-                    <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                    {/* List */}
+                    <div className="max-h-[380px] overflow-y-auto divide-y divide-slate-100">
                       {notifications.length === 0 ? (
-                        <div className="p-6 text-center text-slate-400">No notifications yet</div>
-                      ) : (
-                        notifications.slice(0, 10).map((n: any) => (
-                          <div
-                            key={n._id}
-                            className={`p-3.5 transition-colors hover:bg-slate-50 flex items-start gap-2.5 ${
-                              n.status === 'unread' ? 'bg-emerald-50/40' : ''
-                            }`}
-                          >
-                            <div className="shrink-0 mt-0.5">
-                              {n.channel === 'whatsapp' ? (
-                                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                                  <MessageCircle className="w-3.5 h-3.5" />
-                                </div>
-                              ) : (
-                                <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
-                                  <Bell className="w-3.5 h-3.5" />
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-1">
-                                <p className="font-bold text-slate-800 truncate">{n.title}</p>
-                                <span className="text-[9px] font-black px-1 rounded uppercase text-slate-400">
-                                  {n.channel === 'whatsapp' ? 'WhatsApp' : 'In-App'}
-                                </span>
-                              </div>
-                              <p className="text-slate-500 text-[11px] mt-0.5 leading-relaxed">{n.message}</p>
-                            </div>
+                        <div className="p-10 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+                          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                            <Bell className="w-5 h-5" />
                           </div>
-                        ))
+                          <span className="font-medium text-xs">No notifications yet</span>
+                          <span className="text-[11px] text-slate-400">Alerts will appear here as activity occurs</span>
+                        </div>
+                      ) : (
+                        notifications.slice(0, 15).map((n: any) => {
+                          const isUnread = n.status === 'unread';
+                          const isAnomaly = n.title?.includes('[iForest Alert]');
+                          const isCampaign = n.title?.includes('Campaign Triggered');
+                          return (
+                            <div
+                              key={n._id}
+                              onClick={() => handleNotificationClick(n)}
+                              className={`p-3.5 transition-all flex items-start gap-3 cursor-pointer group select-none ${
+                                isUnread
+                                  ? 'bg-emerald-50/40 hover:bg-emerald-50/70 border-l-[3px] border-l-emerald-600'
+                                  : 'hover:bg-slate-50/80 opacity-80 hover:opacity-100'
+                              }`}
+                            >
+                              {/* Icon */}
+                              <div className="shrink-0 mt-0.5">
+                                {isAnomaly ? (
+                                  <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shadow-xs">
+                                    <ShieldAlert className="w-4 h-4" />
+                                  </div>
+                                ) : isCampaign ? (
+                                  <div className="w-8 h-8 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shadow-xs">
+                                    <Sparkles className="w-4 h-4" />
+                                  </div>
+                                ) : n.channel === 'whatsapp' ? (
+                                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-xs">
+                                    <MessageCircle className="w-4 h-4" />
+                                  </div>
+                                ) : (
+                                  <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-xs">
+                                    <Bell className="w-4 h-4" />
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1.5">
+                                  <p
+                                    className={`text-xs font-semibold leading-snug line-clamp-1 ${
+                                      isUnread ? 'text-slate-900 font-bold' : 'text-slate-700'
+                                    }`}
+                                  >
+                                    {n.title}
+                                  </p>
+                                  <span className="text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider bg-slate-100 text-slate-500 shrink-0 border border-slate-200/60">
+                                    {n.channel === 'whatsapp' ? 'WhatsApp' : 'In-App'}
+                                  </span>
+                                </div>
+                                <p className="text-slate-600 text-[11px] mt-1 leading-relaxed line-clamp-2">
+                                  {n.message}
+                                </p>
+                                <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
+                                  <span className="text-[10px] text-slate-400 font-medium">
+                                    {formatTimeAgo(n.createdAt)}
+                                  </span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[10px] font-bold text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                                      View details &rarr;
+                                    </span>
+                                    {isUnread && (
+                                      <button
+                                        onClick={(e) => handleMarkSingleRead(e, n._id)}
+                                        className="p-1 rounded-md text-slate-400 hover:text-emerald-700 hover:bg-emerald-100 transition cursor-pointer"
+                                        title="Mark as read"
+                                      >
+                                        <Check className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })
                       )}
                     </div>
                   </motion.div>

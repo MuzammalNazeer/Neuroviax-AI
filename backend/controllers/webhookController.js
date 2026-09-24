@@ -1,6 +1,7 @@
 const { stripe, PLANS } = require('../config/stripe');
 const User = require('../models/User');
 const Subscription = require('../models/Subscription');
+const { syncSubscriptionToFirestore } = require('../config/firebaseAdmin');
 
 // In-memory set to store recently processed event IDs for duplicate event protection / idempotency
 const processedEvents = new Set();
@@ -171,6 +172,16 @@ async function handleCheckoutSessionCompleted(session) {
     subscriptionEndDate: currentPeriodEnd,
   });
 
+  // Synchronize to Firebase Firestore
+  await syncSubscriptionToFirestore(userId, {
+    status: subscription.status || 'active',
+    plan,
+    billingInterval,
+    stripeCustomerId,
+    stripeSubscriptionId,
+    currentPeriodEnd,
+  });
+
   console.log(`[Stripe Webhook] User ${userId} upgraded to ${plan} (${billingInterval})`);
 }
 
@@ -229,6 +240,18 @@ async function handleSubscriptionUpdated(stripeSub) {
       subscriptionStatus: status,
       subscriptionEndDate: currentPeriodEnd,
     });
+
+    // Synchronize to Firebase Firestore
+    if (subscription.userId) {
+      await syncSubscriptionToFirestore(subscription.userId, {
+        status,
+        plan: subscription.plan,
+        billingInterval: subscription.billingInterval,
+        stripeCustomerId: subscription.stripeCustomerId,
+        stripeSubscriptionId: subscription.stripeSubscriptionId,
+        currentPeriodEnd: subscription.currentPeriodEnd,
+      });
+    }
 
     console.log(`[Stripe Webhook] Subscription ${stripeSubscriptionId} updated to status: ${status}`);
   }

@@ -37,7 +37,6 @@ import {
   LogIn,
   ChevronRight,
   ShieldAlert,
-  ExternalLink,
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuthStore, isUserSuperAdmin } from '../store/useAuthStore';
@@ -479,17 +478,6 @@ const AdminDashboard: React.FC = () => {
 
           {/* Right Controls: Search, Website Link & Founder Badge */}
           <div className="flex items-center gap-3">
-            {/* Direct Switch to Port 5174 ERP / Website */}
-            <a
-              href="http://localhost:5174"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition"
-              title="Open Website / ERP Platform on Port 5174"
-            >
-              <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
-              <span>ERP & Website (Port 5174)</span>
-            </a>
 
             {/* Search Icon Circle Button */}
             <button
