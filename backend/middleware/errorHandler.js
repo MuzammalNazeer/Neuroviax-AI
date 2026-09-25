@@ -4,8 +4,11 @@ const notFound = (req, res, next) => {
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
-  const statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
-  console.error(err);
+  const statusCode = err.status || err.statusCode || (res.statusCode && res.statusCode !== 200 ? res.statusCode : 500);
+  console.error(`[Error] ${req.method} ${req.originalUrl}:`, err.message);
+  if (res.headersSent) {
+    return next(err);
+  }
   res.status(statusCode).json({
     message: err.message || 'Server error',
     stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,

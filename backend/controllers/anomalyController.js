@@ -8,13 +8,13 @@ const Product = require('../models/Product');
 const AIRecommendation = require('../models/AIRecommendation');
 const Notification = require('../models/Notification');
 const { logAction } = require('../utils/audit');
-const { runIsolationForestAnomalyDetection } = require('../utils/anomalyDetectionEngine');
+const { runHybridAnomalyDetection, runIsolationForestAnomalyDetection } = require('../utils/anomalyDetectionEngine');
 
 // In-memory resolution state cache for demo/active sessions
 const anomalyResolutionStore = new Map();
 
 /**
- * @desc   Run real-time Isolation Forest Anomaly Detection
+ * @desc   Run real-time Hybrid (Isolation Forest + Autoencoder) Anomaly Detection
  * @route  GET /api/anomalies/detect (or POST /api/anomalies/detect)
  * @access Private (Manager, Admin, Owner, Accountant)
  */
@@ -22,6 +22,7 @@ const detectAnomalies = asyncHandler(async (req, res) => {
   const domain = req.query.domain || req.body?.domain || 'all';
   const contamination = parseFloat(req.query.contamination || req.body?.contamination || '0.08');
   const nTrees = parseInt(req.query.nTrees || req.body?.nTrees || '100', 10);
+  const engine = req.query.engine || req.body?.engine || 'hybrid'; // 'hybrid' | 'iforest' | 'autoencoder'
   const autoAlert = req.query.autoAlert === 'true' || req.body?.autoAlert === true;
 
   // Retrieve relevant business entities
@@ -32,7 +33,7 @@ const detectAnomalies = asyncHandler(async (req, res) => {
     Product.find({ business: req.businessId }).limit(100),
   ]);
 
-  const results = runIsolationForestAnomalyDetection({
+  const results = runHybridAnomalyDetection({
     domain,
     payments,
     orders,
@@ -41,6 +42,7 @@ const detectAnomalies = asyncHandler(async (req, res) => {
     businessId: req.businessId,
     contamination,
     nTrees,
+    engine,
   });
 
   // Apply any previously recorded resolution actions

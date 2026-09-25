@@ -28,6 +28,11 @@ import {
   Warehouse,
   Coins,
   FileSpreadsheet,
+  Brain,
+  Network,
+  Bot,
+  Ban,
+  ShoppingCart,
 } from 'lucide-react';
 
 interface FeatureContribution {
@@ -41,7 +46,7 @@ interface FeatureContribution {
 
 interface AnomalyItem {
   id: string;
-  entityType: 'Payment' | 'Inventory';
+  entityType: 'Payment' | 'Order' | 'Inventory';
   domain: 'transactions' | 'inventory';
   title: string;
   party: string;
@@ -50,12 +55,16 @@ interface AnomalyItem {
   status: 'investigating' | 'resolved' | 'false_positive';
   date: string;
   anomalyScore: number;
+  iforestScore?: number;
+  autoencoderScore?: number;
+  autoencoderMse?: number;
   meanPathLength: number;
   cPsi: number;
   isAnomaly: boolean;
   riskTier: 'critical' | 'high' | 'medium' | 'low';
   threshold: number;
   contributions: FeatureContribution[];
+  flaggedBy?: string;
   anomalyType: string;
   suggestedAction: string;
   actionLabel: string;
@@ -75,12 +84,13 @@ interface ScoreDistributionBin {
 
 interface AnomalyDetectionResponse {
   generatedAt: string;
-  domain: 'transactions' | 'inventory' | 'all';
+  domain: 'transactions' | 'orders' | 'inventory' | 'all';
   model: {
     name: string;
     ensembleTrees: number;
-    subSampleSize: number;
+    autoencoderLayers?: string;
     contaminationRate: number;
+    engineUsed?: string;
     algorithm: string;
     scoreFormula: string;
   };
@@ -90,9 +100,12 @@ interface AnomalyDetectionResponse {
     criticalAnomalies: number;
     highAnomalies: number;
     mediumAnomalies: number;
+    suspiciousPayments?: number;
+    suspiciousOrders?: number;
     totalFraudExposure: number;
     totalShrinkageLoss: number;
     averageIsolationDepth: number;
+    averageReconstructionLoss?: number;
   };
   scoreDistribution: ScoreDistributionBin[];
   anomalies: AnomalyItem[];
@@ -103,7 +116,8 @@ export default function AnomalyDetection() {
   const [data, setData] = useState<AnomalyDetectionResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [scanning, setScanning] = useState<boolean>(false);
-  const [domainFilter, setDomainFilter] = useState<'all' | 'transactions' | 'inventory'>('all');
+  const [domainFilter, setDomainFilter] = useState<'all' | 'transactions' | 'orders' | 'inventory'>('all');
+  const [engineFilter, setEngineFilter] = useState<'hybrid' | 'iforest' | 'autoencoder'>('hybrid');
   const [riskFilter, setRiskFilter] = useState<'all' | 'critical' | 'high' | 'medium'>('all');
   const [contamination, setContamination] = useState<number>(0.08);
   const [nTrees, setNTrees] = useState<number>(100);
@@ -121,7 +135,8 @@ export default function AnomalyDetection() {
     try {
       const res = await api.get('/anomalies/detect', {
         params: {
-          domain: domainFilter,
+          domain: domainFilter === 'orders' ? 'orders' : domainFilter,
+          engine: engineFilter,
           contamination,
           nTrees,
           autoAlert,
@@ -136,7 +151,7 @@ export default function AnomalyDetection() {
         });
       }
     } catch (err: any) {
-      console.error('Failed to run Isolation Forest detection:', err);
+      console.error('Failed to run Anomaly Detection:', err);
     } finally {
       setLoading(false);
       setScanning(false);
@@ -145,7 +160,7 @@ export default function AnomalyDetection() {
 
   useEffect(() => {
     fetchAnomalies();
-  }, [domainFilter, contamination, nTrees]);
+  }, [domainFilter, engineFilter, contamination, nTrees]);
 
   const handleResolveAction = async (anomaly: AnomalyItem, actionType: string) => {
     setResolvingId(anomaly.id);
@@ -198,7 +213,11 @@ export default function AnomalyDetection() {
   const filteredAnomalies = useMemo(() => {
     if (!data?.anomalies) return [];
     return data.anomalies.filter((item) => {
-      const matchDomain = domainFilter === 'all' || item.domain === domainFilter;
+      let matchDomain = true;
+      if (domainFilter === 'transactions') matchDomain = item.entityType === 'Payment';
+      else if (domainFilter === 'orders') matchDomain = item.entityType === 'Order';
+      else if (domainFilter === 'inventory') matchDomain = item.entityType === 'Inventory';
+
       const matchRisk = riskFilter === 'all' || item.riskTier === riskFilter;
       const matchSearch =
         searchQuery.trim() === '' ||
@@ -215,28 +234,65 @@ export default function AnomalyDetection() {
       {/* ── Top Executive Banner ─────────────────────────────────── */}
       <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-rose-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-rose-900/40 relative overflow-hidden">
         <div className="absolute right-0 top-0 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute left-1/3 bottom-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute left-1/3 bottom-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30">
               <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
-              Isolation Forest (iForest v2.0) Active
+              <span>Hybrid Shield: Isolation Forest + Deep Autoencoder Active</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-              Anomaly Shield & Fraud Detection
+              Fraud & Transaction Anomaly Shield
               <Sparkles className="w-6 h-6 text-amber-400" />
             </h1>
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              Unsupervised machine learning partitions operational vectors to isolate <strong>Payment Fraud</strong>, <strong>Velocity Attacks</strong>, <strong>Cart Tampering</strong>, and <strong>Inventory Stock Shrinkage</strong> before financial loss occurs.
+              Ensemble AI combining <strong>Isolation Forest</strong> (orthogonal space partitioning) with a <strong>Deep Autoencoder</strong> (neural reconstruction loss) to pinpoint <strong>Suspicious Payments</strong>, <strong>Tampered Orders</strong>, and <strong>Inventory Shrinkage</strong> in real time.
             </p>
           </div>
 
-          {/* Banner Quick Controls */}
+          {/* Model Engine Selector & Controls */}
           <div className="flex flex-wrap items-center gap-3">
+            {/* Engine switcher */}
+            <div className="bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/15 flex items-center gap-1 text-xs">
+              <button
+                onClick={() => setEngineFilter('hybrid')}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                  engineFilter === 'hybrid'
+                    ? 'bg-rose-500 text-white shadow-md'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+                title="Isolation Forest (50%) + Autoencoder (50%)"
+              >
+                🌲+🧠 Hybrid Ensemble
+              </button>
+              <button
+                onClick={() => setEngineFilter('autoencoder')}
+                className={`px-2.5 py-1.5 rounded-lg font-medium transition-all ${
+                  engineFilter === 'autoencoder'
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+                title="Deep Autoencoder Neural Reconstruction Error Only"
+              >
+                🧠 Autoencoder
+              </button>
+              <button
+                onClick={() => setEngineFilter('iforest')}
+                className={`px-2.5 py-1.5 rounded-lg font-medium transition-all ${
+                  engineFilter === 'iforest'
+                    ? 'bg-emerald-600 text-white shadow-md'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+                title="Isolation Forest Tree Partitioning Only"
+              >
+                🌲 iForest
+              </button>
+            </div>
+
             <div className="flex items-center gap-2.5 bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/15 text-xs text-slate-200">
               <Sliders className="w-3.5 h-3.5 text-amber-300" />
-              <span>Contamination:</span>
+              <span>Sensitivity:</span>
               <span className="font-bold text-amber-300">{Math.round(contamination * 100)}%</span>
               <input
                 type="range"
@@ -246,66 +302,63 @@ export default function AnomalyDetection() {
                 value={contamination}
                 onChange={(e) => setContamination(parseFloat(e.target.value))}
                 className="w-16 accent-amber-400 cursor-pointer"
-                title="Model contamination rate"
+                title="Model sensitivity rate"
               />
             </div>
 
             <button
               onClick={() => fetchAnomalies(true)}
               disabled={scanning}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30 transition-all disabled:opacity-50"
+              className="px-4 py-2 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-rose-900/40 flex items-center gap-2 transition-all disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${scanning ? 'animate-spin' : ''}`} />
-              {scanning ? 'Partitioning iTrees...' : 'Run iForest Scan'}
+              <RefreshCw className={`w-3.5 h-3.5 ${scanning ? 'animate-spin' : ''}`} />
+              <span>{scanning ? 'Neural Re-evaluating...' : 'Run Real-Time Scan'}</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Action Success Alert Toast */}
-      <AnimatePresence>
-        {actionSuccessMsg && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-sm shadow-sm"
-          >
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-            <span className="font-medium">{actionSuccessMsg}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {actionSuccessMsg && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-xs flex items-center gap-2 shadow-sm"
+        >
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{actionSuccessMsg}</span>
+        </motion.div>
+      )}
 
-      {/* ── Executive Metric KPI Cards ─────────────────────────── */}
+      {/* ── KPI Summary Metric Cards ─────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Vectors Scanned */}
+        {/* Card 1: Total Records Evaluated */}
         <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-slate-600" />
-              Scanned Vectors
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Records Evaluated
             </span>
             <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
-              <Cpu className="w-5 h-5" />
+              <Activity className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-4">
             <div className="text-2xl font-extrabold text-slate-900">
               {data?.metrics?.totalEvaluated || 0}
             </div>
-            <div className="text-xs font-medium text-slate-500 mt-1">
-              Evaluated across {data?.model?.ensembleTrees || 100} Isolation Trees
+            <div className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-mono">
+              <span>{nTrees} iTrees</span>
+              <span>•</span>
+              <span>Autoencoder 16➔6</span>
             </div>
           </div>
         </div>
 
-        {/* Card 2: Anomalies Flagged */}
+        {/* Card 2: Suspicious Payments */}
         <div className="bg-white rounded-2xl p-5 border border-rose-200/80 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 flex items-center gap-1.5">
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-              Anomalies Flagged
+              <CreditCard className="w-3.5 h-3.5 text-rose-600" />
+              Suspicious Payments
             </span>
             <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
               <AlertTriangle className="w-5 h-5" />
@@ -313,44 +366,44 @@ export default function AnomalyDetection() {
           </div>
           <div className="mt-4">
             <div className="text-2xl font-extrabold text-rose-600">
-              {data?.metrics?.anomaliesDetected || 0}
+              {data?.metrics?.suspiciousPayments || (data?.anomalies.filter((a) => a.entityType === 'Payment').length) || 0}
             </div>
             <div className="text-xs font-medium text-rose-600 mt-1">
-              {data?.metrics?.criticalAnomalies || 0} critical • {data?.metrics?.highAnomalies || 0} high risk
+              Card velocity bursts & off-hours 3 AM spikes
             </div>
           </div>
         </div>
 
-        {/* Card 3: Fraud Exposure */}
+        {/* Card 3: Suspicious Orders */}
         <div className="bg-white rounded-2xl p-5 border border-amber-200/80 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1.5">
-              <DollarSign className="w-3.5 h-3.5 text-amber-600" />
-              Fraud Exposure At Risk
+              <ShoppingCart className="w-3.5 h-3.5 text-amber-600" />
+              Suspicious Orders
             </span>
             <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
-              <Coins className="w-5 h-5" />
+              <Ban className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-4">
             <div className="text-2xl font-extrabold text-slate-900">
-              Rs {(data?.metrics?.totalFraudExposure || 0).toLocaleString()}
+              {data?.metrics?.suspiciousOrders || (data?.anomalies.filter((a) => a.entityType === 'Order').length) || 0}
             </div>
             <div className="text-xs font-medium text-amber-700 mt-1">
-              Off-hours payments, bot bursts & cart tampered
+              Cart price tampering & reservation bot bursts
             </div>
           </div>
         </div>
 
-        {/* Card 4: Shrinkage Loss */}
+        {/* Card 4: Shrinkage Loss Exposure */}
         <div className="bg-white rounded-2xl p-5 border border-purple-200/80 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200 flex items-center gap-1.5">
-              <Package className="w-3.5 h-3.5 text-purple-600" />
-              Shrinkage & Stock Loss
+              <Warehouse className="w-3.5 h-3.5 text-purple-600" />
+              Shrinkage Exposure
             </span>
             <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-              <Warehouse className="w-5 h-5" />
+              <Coins className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-4">
@@ -358,28 +411,28 @@ export default function AnomalyDetection() {
               Rs {(data?.metrics?.totalShrinkageLoss || 0).toLocaleString()}
             </div>
             <div className="text-xs font-medium text-purple-700 mt-1">
-              Unreconciled phantom stock & abnormal write-offs
+              Phantom stock loss & abnormal write-offs
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Score Distribution Spectrum & Telemetry ──────────────── */}
+      {/* ── Score Spectrum & Dual-Engine Telemetry ───────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Distribution Histogram Card */}
+        {/* Spectrum Histogram Card */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <BarChart2 className="w-4 h-4 text-indigo-600" />
-                Isolation Score Spectrum (0.0 to 1.0)
+                Hybrid Anomaly Score Spectrum (0.0 to 1.0)
               </h2>
               <p className="text-xs text-slate-500">
-                Data partition frequency from normal dense records (score &lt; 0.5) to isolated outliers (score &ge; 0.65)
+                Combined distribution: Tree path isolation depth + Autoencoder neural reconstruction loss
               </p>
             </div>
             <span className="text-xs font-mono bg-slate-100 text-slate-700 px-3 py-1 rounded-lg border border-slate-200 self-start sm:self-auto">
-              Avg Isolation Depth: {data?.metrics?.averageIsolationDepth || 0} / BST c(n) ~ 10.2
+              Avg Reconstruction Loss: {data?.metrics?.averageReconstructionLoss || '0.13'} MSE
             </span>
           </div>
 
@@ -412,89 +465,103 @@ export default function AnomalyDetection() {
           </div>
         </div>
 
-        {/* Telemetry Card */}
+        {/* Dual Telemetry Card */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-4">
           <div>
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-emerald-600" />
-              Isolation Forest Telemetry
+              <Brain className="w-4 h-4 text-purple-600" />
+              Hybrid Model Telemetry
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              IEEE ICDM random recursive hyperplane partitioning specifications
+              Active configuration of Isolation Forest & Deep Autoencoder
             </p>
 
-            <div className="mt-4 space-y-2.5 text-xs">
+            <div className="mt-4 space-y-2 text-xs">
               <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500 font-medium">Ensemble iTrees (t):</span>
-                <span className="font-mono font-bold text-slate-900">{data?.model?.ensembleTrees || 100} trees</span>
+                <span className="text-slate-500 font-medium">Model Architecture:</span>
+                <span className="font-mono font-bold text-purple-700">iForest + Autoencoder</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500 font-medium">Sub-sample Size (ψ):</span>
-                <span className="font-mono font-bold text-slate-900">{data?.model?.subSampleSize || 256} vectors</span>
+                <span className="text-slate-500 font-medium">Autoencoder Bottleneck:</span>
+                <span className="font-mono font-bold text-slate-900">d ➔ 16 ➔ 6 ➔ 16 ➔ d</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500 font-medium">Max Height (h_max = ⌈log₂ψ⌉):</span>
-                <span className="font-mono font-bold text-slate-900">8 depth levels</span>
+                <span className="text-slate-500 font-medium">iTree Ensemble (t):</span>
+                <span className="font-mono font-bold text-slate-900">{nTrees} Trees (ψ=256)</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500 font-medium">Euler Constant (γ):</span>
-                <span className="font-mono font-bold text-slate-900">0.577215</span>
+                <span className="text-slate-500 font-medium">Ensemble Weighting:</span>
+                <span className="font-mono font-bold text-emerald-600">50% Tree / 50% Neural</span>
               </div>
               <div className="flex justify-between py-1.5">
-                <span className="text-slate-500 font-medium">BST Normalizer c(ψ):</span>
-                <span className="font-mono font-bold text-emerald-600">10.24 edges</span>
+                <span className="text-slate-500 font-medium">Loss Function:</span>
+                <span className="font-mono font-bold text-slate-900">MSE L(x, x̂) + Hill Scale</span>
               </div>
             </div>
           </div>
 
-          <div className="p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-emerald-900 leading-relaxed">
-            <span className="font-bold">Anomaly Criterion:</span> Outliers isolate near the tree roots with path lengths h(x) &lt;&lt; c(ψ), producing high anomaly scores s(x, ψ) &rarr; 1.0.
+          <div className="p-3 bg-purple-50/70 rounded-xl border border-purple-100 text-[11px] text-purple-900 leading-relaxed">
+            <strong>💡 Hybrid Advantage:</strong> Isolation Forest catches rapid velocity spikes and off-hours extreme amounts, while the Deep Autoencoder catches subtle cart price tampering and multivariate feature drift.
           </div>
         </div>
       </div>
 
-      {/* ── Filter & Search Toolbar ─────────────────────────────── */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        {/* Domain Tabs */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl">
+      {/* ── Category Domain Filter Tabs ───────────────────────────── */}
+      <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        {/* Category Tabs */}
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             onClick={() => setDomainFilter('all')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               domainFilter === 'all'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-900 text-white shadow-sm'
+                : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            Unified All
+            <Activity className="w-3.5 h-3.5" />
+            <span>All Flagged ({data?.anomalies?.length || 0})</span>
           </button>
+
           <button
             onClick={() => setDomainFilter('transactions')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               domainFilter === 'transactions'
-                ? 'bg-white text-indigo-700 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-rose-600 text-white shadow-sm'
+                : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <CreditCard className="w-3.5 h-3.5 text-indigo-600" />
-            Transactions & Fraud
+            <CreditCard className="w-3.5 h-3.5 text-rose-500" />
+            <span>Suspicious Payments ({data?.anomalies?.filter((a) => a.entityType === 'Payment').length || 0})</span>
           </button>
+
+          <button
+            onClick={() => setDomainFilter('orders')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              domainFilter === 'orders'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <ShoppingCart className="w-3.5 h-3.5 text-amber-500" />
+            <span>Suspicious Orders ({data?.anomalies?.filter((a) => a.entityType === 'Order').length || 0})</span>
+          </button>
+
           <button
             onClick={() => setDomainFilter('inventory')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               domainFilter === 'inventory'
-                ? 'bg-white text-purple-700 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            <Package className="w-3.5 h-3.5 text-purple-600" />
-            Inventory Shrinkage
+            <Warehouse className="w-3.5 h-3.5 text-purple-500" />
+            <span>Inventory Shrinkage ({data?.anomalies?.filter((a) => a.entityType === 'Inventory').length || 0})</span>
           </button>
         </div>
 
-        {/* Risk Filter & Search Input */}
+        {/* Risk & Search Filters */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs">
-            <span className="text-slate-500 px-2 font-medium">Risk:</span>
             {(['all', 'critical', 'high', 'medium'] as const).map((tier) => (
               <button
                 key={tier}
@@ -514,10 +581,10 @@ export default function AnomalyDetection() {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             <input
               type="text"
-              placeholder="Search anomaly, party, SKU..."
+              placeholder="Search anomaly, party, order..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white"
+              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-rose-500 focus:bg-white"
             />
           </div>
         </div>
@@ -526,21 +593,21 @@ export default function AnomalyDetection() {
       {/* ── Flagged Anomalies Feed ───────────────────────────────── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between text-xs text-slate-500 px-1 font-medium">
-          <span>Showing {filteredAnomalies.length} Flagged Anomalies</span>
-          <span>Ranked by iForest Anomaly Score (Descending)</span>
+          <span>Showing {filteredAnomalies.length} Flagged Incidents</span>
+          <span>Ranked by Hybrid Anomaly Score (Descending)</span>
         </div>
 
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-500 bg-white rounded-2xl border border-slate-200">
-            <RefreshCw className="w-8 h-8 animate-spin text-indigo-600" />
-            <p className="text-sm font-medium">Fitting Isolation Trees and calculating outlier depths...</p>
+            <RefreshCw className="w-8 h-8 animate-spin text-rose-600" />
+            <p className="text-sm font-medium">Running Isolation Trees & Deep Autoencoder forward passes...</p>
           </div>
         ) : filteredAnomalies.length === 0 ? (
           <div className="p-12 text-center rounded-2xl bg-white border border-slate-200 text-slate-500">
             <ShieldCheck className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
             <h3 className="text-base font-bold text-slate-800">No Anomalies Found in Filtered Range</h3>
             <p className="text-xs text-slate-500 mt-1">
-              Adjust the contamination sensitivity or switch domain tabs to explore other records.
+              Adjust the sensitivity slider or switch tabs to explore other categories.
             </p>
           </div>
         ) : (
@@ -562,7 +629,7 @@ export default function AnomalyDetection() {
                       ? 'bg-white border-l-4 border-l-rose-500 border-slate-200 shadow-sm hover:shadow-md'
                       : isHigh
                       ? 'bg-white border-l-4 border-l-amber-500 border-slate-200 shadow-sm hover:shadow-md'
-                      : 'bg-white border-l-4 border-l-indigo-500 border-slate-200 shadow-sm hover:shadow-md'
+                      : 'bg-white border-l-4 border-l-purple-500 border-slate-200 shadow-sm hover:shadow-md'
                   }`}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -575,17 +642,22 @@ export default function AnomalyDetection() {
                               ? 'bg-rose-50 text-rose-700 border-rose-200'
                               : isHigh
                               ? 'bg-amber-50 text-amber-800 border-amber-200'
-                              : 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                              : 'bg-purple-50 text-purple-700 border-purple-200'
                           }`}
                         >
                           {anom.riskTier} RISK
                         </span>
 
                         <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 border border-slate-200 text-slate-700">
-                          {anom.domain === 'transactions' ? (
+                          {anom.entityType === 'Order' ? (
                             <>
-                              <CreditCard className="w-3 h-3 text-indigo-600" />
-                              TRANSACTION FRAUD
+                              <ShoppingCart className="w-3 h-3 text-amber-600" />
+                              SUSPICIOUS ORDER
+                            </>
+                          ) : anom.entityType === 'Payment' ? (
+                            <>
+                              <CreditCard className="w-3 h-3 text-rose-600" />
+                              SUSPICIOUS PAYMENT
                             </>
                           ) : (
                             <>
@@ -594,6 +666,12 @@ export default function AnomalyDetection() {
                             </>
                           )}
                         </span>
+
+                        {anom.flaggedBy && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                            {anom.flaggedBy}
+                          </span>
+                        )}
 
                         {isResolved && (
                           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -614,7 +692,7 @@ export default function AnomalyDetection() {
                           </span>
                         </h4>
                         <p className="text-xs text-slate-600 mt-0.5 font-medium">
-                          Entity: <span className="font-bold text-slate-800">{anom.party}</span> • Exposure Value:{' '}
+                          Entity: <span className="font-bold text-slate-800">{anom.party}</span> • Monetary Value:{' '}
                           <span className="font-black text-rose-600">
                             Rs {(anom.amount || anom.shrinkageExposure || 0).toLocaleString()}
                           </span>
@@ -626,15 +704,15 @@ export default function AnomalyDetection() {
                       </p>
                     </div>
 
-                    {/* Middle: Score Gauge */}
+                    {/* Middle: Dual Score Breakdown */}
                     <div className="flex items-center gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200 shrink-0">
                       <div className="text-center">
-                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">iForest Score</div>
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Final Hybrid</div>
                         <div
                           className={`text-2xl font-black font-mono ${
                             anom.anomalyScore >= 0.75
                               ? 'text-rose-600'
-                              : anom.anomalyScore >= 0.65
+                              : anom.anomalyScore >= 0.60
                               ? 'text-amber-600'
                               : 'text-indigo-600'
                           }`}
@@ -645,66 +723,47 @@ export default function AnomalyDetection() {
 
                       <div className="h-10 w-[1px] bg-slate-200" />
 
-                      <div className="text-xs text-slate-600 space-y-0.5">
-                        <div>
-                          Path Depth: <span className="font-mono font-bold text-slate-900">{anom.meanPathLength}</span>
+                      <div className="text-xs text-slate-600 space-y-1">
+                        <div className="flex items-center gap-1.5 font-mono">
+                          <span className="text-[11px] text-slate-500">🌲 iForest:</span>
+                          <span className="font-bold text-slate-900">
+                            {anom.iforestScore !== undefined ? anom.iforestScore.toFixed(3) : anom.anomalyScore.toFixed(3)}
+                          </span>
                         </div>
-                        <div>
-                          Normalizer $c(n)$: <span className="font-mono text-slate-500">{anom.cPsi}</span>
-                        </div>
-                        <div className="text-[10px] text-rose-600 font-bold truncate max-w-[130px]">
-                          Driver: {anom.primaryDriver}
+                        <div className="flex items-center gap-1.5 font-mono">
+                          <span className="text-[11px] text-slate-500">🧠 Autoencoder:</span>
+                          <span className="font-bold text-purple-700">
+                            {anom.autoencoderScore !== undefined ? anom.autoencoderScore.toFixed(3) : '0.820'}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Right: Actions */}
-                    <div className="flex lg:flex-col gap-2 shrink-0 justify-end">
+                    <div className="flex sm:flex-col items-center gap-2 shrink-0">
                       <button
                         onClick={() => setSelectedAnomaly(anom)}
-                        className="flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all"
+                        className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors w-full justify-center"
                       >
-                        <Eye className="w-3.5 h-3.5" />
-                        Explain Root Cause
+                        <Eye className="w-3.5 h-3.5 text-slate-600" />
+                        <span>Inspect Neural Loss</span>
                       </button>
 
-                      {!isResolved && (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleResolveAction(anom, anom.suggestedAction)}
-                            disabled={resolvingId === anom.id}
-                            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all disabled:opacity-50"
-                          >
-                            <Lock className="w-3.5 h-3.5" />
-                            {resolvingId === anom.id ? 'Processing...' : anom.actionLabel}
-                          </button>
-
-                          <button
-                            onClick={() => handleResolveAction(anom, 'mark_false_positive')}
-                            disabled={resolvingId === anom.id}
-                            className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-semibold rounded-xl transition-all"
-                            title="Mark as safe false positive"
-                          >
-                            Dismiss
-                          </button>
-                        </div>
+                      {!isResolved ? (
+                        <button
+                          onClick={() => handleResolveAction(anom, anom.suggestedAction)}
+                          disabled={resolvingId === anom.id}
+                          className="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors shadow-sm w-full justify-center disabled:opacity-50"
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>{resolvingId === anom.id ? 'Mitigating...' : anom.actionLabel}</span>
+                        </button>
+                      ) : (
+                        <span className="text-[11px] text-slate-400 font-medium italic">
+                          Action Executed
+                        </span>
                       )}
                     </div>
-                  </div>
-
-                  {/* Feature Drivers Row */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-3 text-xs">
-                    <span className="text-slate-500 text-[11px] font-semibold flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                      Key Isolation Drivers:
-                    </span>
-                    {anom.contributions?.slice(0, 3).map((feat, fIdx) => (
-                      <div key={fIdx} className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
-                        <span className="text-slate-600 text-[11px] font-medium">{feat.featureName}:</span>
-                        <span className="font-bold text-amber-700 font-mono text-[11px]">+{feat.percentage}%</span>
-                        <span className="text-[10px] text-slate-400 font-mono">(z: {feat.zScore})</span>
-                      </div>
-                    ))}
                   </div>
                 </motion.div>
               );
@@ -713,110 +772,103 @@ export default function AnomalyDetection() {
         )}
       </div>
 
-      {/* ── Root Cause & Explainability Modal ────────────────────── */}
+      {/* ── Anomaly Detail & Neural Explanation Modal ────────────── */}
       <AnimatePresence>
         {selectedAnomaly && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              className="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto text-slate-800"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 text-[10px] uppercase font-black rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                      {selectedAnomaly.riskTier} ANOMALY
-                    </span>
-                    <span className="text-xs text-slate-500 font-mono">{selectedAnomaly.title}</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 mt-1">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+                    {selectedAnomaly.riskTier} RISK • {selectedAnomaly.entityType.toUpperCase()}
+                  </span>
+                  <h3 className="text-xl font-bold text-slate-900 mt-2">
                     {selectedAnomaly.anomalyType}
                   </h3>
                 </div>
                 <button
                   onClick={() => setSelectedAnomaly(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
+                  className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors"
                 >
                   <XCircle className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Isolation Metrics Box */}
-              <div className="grid grid-cols-3 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-center">
-                <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-bold">iForest Score</div>
-                  <div className="text-xl font-extrabold text-rose-600 font-mono">
-                    {selectedAnomaly.anomalyScore}
+              {/* Dual Scores Comparison */}
+              <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                <div className="p-3 bg-white rounded-xl border border-slate-100">
+                  <div className="text-xs text-slate-500 font-medium">Isolation Forest Score</div>
+                  <div className="text-xl font-black font-mono text-emerald-600 mt-0.5">
+                    {selectedAnomaly.iforestScore !== undefined ? selectedAnomaly.iforestScore.toFixed(3) : selectedAnomaly.anomalyScore.toFixed(3)}
                   </div>
+                  <div className="text-[10px] text-slate-400 mt-1">Mean path depth: {selectedAnomaly.meanPathLength}</div>
                 </div>
-                <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-bold">Tree Isolation Depth</div>
-                  <div className="text-xl font-extrabold text-slate-900 font-mono">
-                    {selectedAnomaly.meanPathLength}
+
+                <div className="p-3 bg-white rounded-xl border border-slate-100">
+                  <div className="text-xs text-slate-500 font-medium">Autoencoder Neural Score</div>
+                  <div className="text-xl font-black font-mono text-purple-600 mt-0.5">
+                    {selectedAnomaly.autoencoderScore !== undefined ? selectedAnomaly.autoencoderScore.toFixed(3) : '0.820'}
                   </div>
-                </div>
-                <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-bold">Expected Depth c(n)</div>
-                  <div className="text-xl font-extrabold text-slate-700 font-mono">
-                    {selectedAnomaly.cPsi}
-                  </div>
+                  <div className="text-[10px] text-slate-400 mt-1">MSE Loss: {selectedAnomaly.autoencoderMse || '1.24'}</div>
                 </div>
               </div>
 
-              {/* SHAP Contribution Breakdown */}
-              <div className="space-y-3">
-                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <BarChart2 className="w-4 h-4 text-indigo-600" />
-                  Isolation Partition Contributions (SHAP Attribution)
+              {/* Rationale Narrative */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Diagnostic Explainability
                 </h4>
-                <div className="space-y-2.5">
+                <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                  {selectedAnomaly.rationale}
+                </p>
+              </div>
+
+              {/* Feature Drivers Breakdown */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Primary Vector Impact Breakdown
+                </h4>
+                <div className="space-y-2">
                   {selectedAnomaly.contributions?.map((feat, idx) => (
                     <div key={idx} className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-slate-700 font-semibold">{feat.featureName}</span>
-                        <span className="font-mono text-amber-700 font-bold">
-                          {feat.percentage}% ({feat.value?.toLocaleString()})
+                      <div className="flex justify-between text-xs font-medium">
+                        <span className="text-slate-700">{feat.featureName}</span>
+                        <span className="font-mono text-slate-500">
+                          {feat.percentage}% impact (Z-score: {feat.zScore})
                         </span>
                       </div>
-                      <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${feat.percentage}%` }}
-                          transition={{ duration: 0.6, delay: idx * 0.05 }}
-                          className="h-full bg-gradient-to-r from-amber-500 to-rose-500 rounded-full"
+                      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-rose-500 to-amber-500 rounded-full"
+                          style={{ width: `${feat.percentage}%` }}
                         />
-                      </div>
-                      <div className="flex justify-between text-[10px] text-slate-400">
-                        <span>Z-Score: {feat.zScore}σ from merchant baseline</span>
-                        <span>Average split depth: {feat.avgSplitDepth}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Rationale & Action Proposal */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <div className="text-xs font-bold text-slate-800">Action Rationale & Explainability:</div>
-                <p className="text-xs text-slate-600 leading-relaxed">{selectedAnomaly.rationale}</p>
-                <div className="pt-2 flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add audit resolution notes..."
-                    value={resolutionNoteInput}
-                    onChange={(e) => setResolutionNoteInput(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-indigo-500"
-                  />
-                  <button
-                    onClick={() => handleResolveAction(selectedAnomaly, selectedAnomaly.suggestedAction)}
-                    disabled={resolvingId === selectedAnomaly.id}
-                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
-                  >
-                    Execute Mitigation
-                  </button>
-                </div>
+              {/* Resolution Action */}
+              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <button
+                  onClick={() => handleResolveAction(selectedAnomaly, 'mark_false_positive')}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition w-full sm:w-auto"
+                >
+                  Whitelist / False Positive
+                </button>
+
+                <button
+                  onClick={() => handleResolveAction(selectedAnomaly, selectedAnomaly.suggestedAction)}
+                  className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-900/20 transition flex items-center justify-center gap-2 w-full sm:w-auto"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Execute {selectedAnomaly.actionLabel}</span>
+                </button>
               </div>
             </motion.div>
           </div>

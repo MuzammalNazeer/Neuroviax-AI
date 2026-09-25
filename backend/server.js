@@ -36,6 +36,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const anomalyRoutes = require('./routes/anomalyRoutes');
 const customerSegmentationRoutes = require('./routes/customerSegmentationRoutes');
+const sentimentIntentRoutes = require('./routes/sentimentIntentRoutes');
 
 const app = express();
 
@@ -111,11 +112,13 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/suppliers', supplierRoutes);
-app.use('/api/ai', aiRoutes);
+app.use('/api/ai/sentiment-intent', sentimentIntentRoutes);
+app.use('/api/sentiment-intent', sentimentIntentRoutes);
 app.use('/api/ai/anomalies', anomalyRoutes);
 app.use('/api/anomalies', anomalyRoutes);
 app.use('/api/customer-segmentation', customerSegmentationRoutes);
 app.use('/api/ai/segmentation', customerSegmentationRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportRoutes);

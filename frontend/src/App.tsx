@@ -42,6 +42,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminAuth from './pages/AdminAuth';
 import AIChatboardPage from './pages/AIChatboardPage';
 import ArchitecturePage from './pages/ArchitecturePage';
+import SentimentIntentPage from './pages/SentimentIntentPage';
 
 const App: React.FC = () => {
   // If running on dedicated admin port (5175), serve the AI Decision Cockpit & Admin Auth directly
@@ -89,6 +90,10 @@ const App: React.FC = () => {
       <Route path="/chatboard" element={<AIChatboardPage />} />
       <Route path="/copilot" element={<AIChatboardPage />} />
       <Route path="/ai-chatboard" element={<AIChatboardPage />} />
+      <Route path="/customer-sentiment" element={<SentimentIntentPage />} />
+      <Route path="/sentiment-analysis" element={<SentimentIntentPage />} />
+      <Route path="/intent-classification" element={<SentimentIntentPage />} />
+      <Route path="/sentiment-intent" element={<SentimentIntentPage />} />
       <Route path="/subscription/plans" element={<PricingPage />} />
       <Route path="/subscription/success" element={<CheckoutSuccess />} />
       <Route path="/subscription/cancel" element={<CheckoutCancel />} />
@@ -127,6 +132,8 @@ const App: React.FC = () => {
         <Route path="/cash-flow-prediction" element={<CashFlowPrediction />} />
         <Route path="/anomaly-detection" element={<AnomalyDetection />} />
         <Route path="/customer-segmentation" element={<CustomerSegmentation />} />
+        <Route path="/customer-sentiment" element={<SentimentIntentPage />} />
+        <Route path="/sentiment-intent" element={<SentimentIntentPage />} />
         <Route path="/ai-assistants" element={<AIAssistants />} />
         <Route path="/team" element={<Team />} />
       </Route>

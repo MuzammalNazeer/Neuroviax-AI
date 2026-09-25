@@ -6,6 +6,7 @@ const Customer = require('../models/Customer');
 const Payment = require('../models/Payment');
 const AIRecommendation = require('../models/AIRecommendation');
 const Supplier = require('../models/Supplier');
+const { classifyBusinessIntent, analyzeCustomerSentiment } = require('../utils/bertNlpEngine');
 
 /**
  * Intelligent Language Detector (Urdu / Hindi / Roman Urdu vs English)
@@ -395,12 +396,19 @@ const copilotChat = asyncHandler(async (req, res) => {
     }
   }
 
+  const intentClassification = classifyBusinessIntent(rawMsg);
+  const sentimentAnalysis = analyzeCustomerSentiment(rawMsg);
+
   res.json({
     reply,
     actions,
     snapshot,
     isUrdu,
     persona,
+    nlpMetadata: {
+      intent: intentClassification,
+      sentiment: sentimentAnalysis,
+    },
     timestamp: new Date().toISOString(),
   });
 });

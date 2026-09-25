@@ -40,6 +40,8 @@ import {
   TrendingUp,
   LineChart,
   ShieldAlert,
+  Cpu,
+  MessageSquareQuote,
 } from 'lucide-react';
 import api from '../api/axios';
 
@@ -54,11 +56,13 @@ const ALL_NAV_ITEMS = [
   { to: '/suppliers', label: 'Suppliers', icon: Truck, group: 'core', roles: ['owner', 'admin', 'manager'] },
   { to: '/reports', label: 'Reports', icon: BarChart3, group: 'admin', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'BI' },
   { to: '/integrations', label: 'Integrations', icon: Plug, group: 'admin', roles: ['owner', 'admin'], badge: 'API' },
+  { to: '/architecture', label: 'Event Architecture', icon: Cpu, group: 'admin', roles: ['owner', 'admin', 'manager', 'accountant', 'staff'], badge: 'SYSTEM' },
   { to: '/subscription', label: 'Subscription', icon: Crown, group: 'admin', roles: ['owner', 'admin', 'manager', 'accountant', 'staff'] },
   { to: '/team', label: 'Team & Admin', icon: UserCog, group: 'admin', roles: ['owner', 'admin', 'manager'], badge: 'ADMIN' },
   { to: '/demand-forecasting', label: 'Demand Forecasting', icon: TrendingUp, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'ML' },
   { to: '/cash-flow-prediction', label: 'Cash-Flow AI', icon: LineChart, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'XGB' },
   { to: '/anomaly-detection', label: 'Anomaly Shield', icon: ShieldAlert, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant', 'staff'], badge: 'iForest' },
+  { to: '/customer-sentiment', label: 'Sentiment & Intent', icon: MessageSquareQuote, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'BERT' },
   { to: '/customer-segmentation', label: 'Customer Segments', icon: Users, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'K-Means' },
   { to: '/recommendations', label: 'AI Recommendations', icon: Sparkles, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'AI' },
   { to: '/ai-assistants', label: 'AI Assistants', icon: Bot, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'NEW' },
