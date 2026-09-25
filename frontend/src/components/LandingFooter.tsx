@@ -97,6 +97,9 @@ export const LandingFooter: React.FC = () => {
             <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Platform</h4>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
+                <Link to="/architecture" className="hover:text-emerald-400 transition">System Architecture</Link>
+              </li>
+              <li>
                 <Link to="/assistants" className="hover:text-emerald-400 transition">6 AI Assistants</Link>
               </li>
               <li>

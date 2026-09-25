@@ -32,15 +32,16 @@
    - [5. Machine Learning Cash Flow Prediction Cockpit](#5--machine-learning-cash-flow-prediction-cockpit)
    - [6. Customer Segmentation & RFM Clustering](#6--customer-segmentation--rfm-clustering)
    - [7. Conversational Copilot & Real-Time AI Chatboard](#7--conversational-copilot--real-time-ai-chatboard)
-5. [Core Enterprise ERP Modules](#-core-enterprise-erp-modules)
-6. [Multi-Port Architecture & Orchestration](#-multi-port-architecture--orchestration)
-7. [Verified Demo Credentials](#-verified-demo-credentials)
-8. [Complete Page & Route Architecture](#-complete-page--route-architecture)
-9. [Comprehensive REST API Reference](#-comprehensive-rest-api-reference)
-10. [Quick Start & Setup Guide](#-quick-start--setup-guide)
-11. [Postman API Collection](#-postman-api-collection)
-12. [Environment Configuration Reference](#-environment-configuration-reference)
-13. [Authors & Maintainers](#-authors--maintainers)
+5. [Recommended Distributed System Architecture](#-recommended-distributed-system-architecture)
+6. [Core Enterprise ERP Modules](#-core-enterprise-erp-modules)
+7. [Multi-Port Architecture & Orchestration](#-multi-port-architecture--orchestration)
+8. [Verified Demo Credentials](#-verified-demo-credentials)
+9. [Complete Page & Route Architecture](#-complete-page--route-architecture)
+10. [Comprehensive REST API Reference](#-comprehensive-rest-api-reference)
+11. [Quick Start & Setup Guide](#-quick-start--setup-guide)
+12. [Postman API Collection](#-postman-api-collection)
+13. [Environment Configuration Reference](#-environment-configuration-reference)
+14. [Authors & Maintainers](#-authors--maintainers)
 
 ---
 
@@ -151,6 +152,65 @@ Located at `/chatboard` / `/copilot` & embedded drawer:
 
 ---
 
+## 🏗️ Recommended Distributed System Architecture
+
+Neuroviax AI employs an event-driven, real-time reactive architecture designed for sub-second synchronization across distributed retail stores, branches, and warehouses:
+
+```
+                    ┌──────────────────────┐
+                    │      React Web       │
+                    │   Socket.IO Client   │
+                    └──────────┬───────────┘
+                               │
+                         WebSocket
+                               │
+                    ┌──────────▼───────────┐
+                    │    Node.js Backend    │
+                    │       Express         │
+                    │      Socket.IO        │
+                    └──────┬───────┬────────┘
+                           │       │
+                  ┌────────▼─┐   ┌─▼──────────┐
+                  │ MongoDB  │   │   Redis    │
+                  │ Database │   │ Pub/Sub    │
+                  └──────────┘   │ + Streams  │
+                                 └─────┬───────┘
+                                       │
+                         ┌─────────────▼─────────────┐
+                         │       Event System        │
+                         │ ORDER / STOCK / PAYMENT   │
+                         │ AI / ALERT / CHAT EVENTS  │
+                         └─────────────┬─────────────┘
+                                       │
+                    ┌──────────────────▼────────────────┐
+                    │          AI Orchestrator          │
+                    │ ML Models + LLM + RAG + Agents   │
+                    └──────────────────┬────────────────┘
+                                       │
+                         ┌─────────────▼─────────────┐
+                         │ Notification Service      │
+                         └──────┬──────────┬──────────┘
+                                │          │
+                              FCM       WhatsApp
+                                │          │
+                           Mobile/Web    Customer   
+```
+
+### Architectural Tiers Breakdown:
+
+1. **Client Tier (`React Web + Socket.IO Client`)**: Single-page application built with React 18, TypeScript, Tailwind CSS, and Framer Motion. Maintains persistent bidirectional WebSocket connections for real-time POS scanning, live cart updates, and instant copilot streaming.
+2. **Gateway & API Server (`Node.js Backend + Express + Socket.IO`)**: Handles REST endpoints, authentication (JWT/OAuth), role-based guards (RBAC), and marshals events into persistence and message brokers.
+3. **Dual Persistence & Event Stream Tier**:
+   - **MongoDB Database**: Document-based storage for businesses, branches, products, inventory movements, transactions, and audit ledgers (with automatic fallback to JSON-persisted in-memory database).
+   - **Redis Pub/Sub + Streams**: High-throughput message queuing, caching, and stream distribution preventing bottlenecked database locks.
+4. **Event System**: Central routing bus segregating topics across `ORDER_EVENTS`, `STOCK_EVENTS`, `PAYMENT_EVENTS`, `AI_EVENTS`, `ALERT_EVENTS`, and `CHAT_EVENTS`.
+5. **AI Orchestrator**: Evaluates real-time events against algorithmic models (**Isolation Forest** for fraud & shrinkage, **Cosine Similarity** for recommendations, **XGBoost & LightGBM** for cash flow projections, **Exponential Smoothing** for demand forecasts) and triggers autonomous domain copilots.
+6. **Notification Service**: 
+   - **Firebase Cloud Messaging (FCM)**: Immediate operational push notifications to store managers, cashiers, and accountants on web and mobile.
+   - **WhatsApp Business API**: Customer receipts, automated order dispatches, and interactive 1-tap reorder approvals.
+
+---
+
 ## 💼 Core Enterprise ERP Modules
 
 - **Authentication & RBAC**: Dual JWT access/refresh token cycle, Google OAuth 2.0 SSO, Firebase ID token support, and 6-digit SHA-256 OTP password recovery. Role levels: `owner`, `admin`, `manager`, `staff`, `accountant`.
@@ -196,6 +256,7 @@ Pre-seeded accounts ready for immediate testing:
 - `/` or `/landing` — Landing Page with Hero, Dynamic Features, Metrics & Testimonials
 - `/assistants` — 6 Autonomous AI Domain Copilots Interactive Sandbox
 - `/abop-loop` — 5-Stage Closed Loop Architecture Deep Dive
+- `/architecture` or `/system-architecture` — Complete Distributed System Architecture & Interactive Signal Simulator
 - `/differentiator` — 30/70 Moat Analysis & Competitive Matrix vs SAP/Zoho/Tally
 - `/pricing` — Multi-Currency (PKR ₨ / USD $) Subscription Tier Matrix
 - `/faq` — Searchable Knowledge Base & Accordions

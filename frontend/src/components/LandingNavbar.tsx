@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Info,
   Mail,
+  Cpu,
 } from 'lucide-react';
 
 interface NavItem {
@@ -25,6 +26,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'AI Chatboard', path: '/chatboard', icon: Sparkles, badge: 'Copilot' },
+  { label: 'Architecture', path: '/architecture', icon: Cpu, badge: 'System' },
   { label: '6 AI Assistants', path: '/assistants', icon: Bot },
   { label: 'ABOP Loop', path: '/abop-loop', icon: Layers },
   { label: '30/70 Differentiator', path: '/differentiator', icon: Scale },

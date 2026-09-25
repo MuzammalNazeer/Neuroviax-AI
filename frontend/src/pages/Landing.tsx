@@ -33,6 +33,11 @@ import {
   Crown,
   Scale,
   Layers,
+  Cpu,
+  Database,
+  Radio,
+  Bell,
+  MessageSquare,
 } from 'lucide-react';
 
 // ── Animation variants ────────────────────────────────────
@@ -497,6 +502,206 @@ const Landing: React.FC = () => {
                 </motion.div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── RECOMMENDED COMPLETE SYSTEM ARCHITECTURE ──────────── */}
+      <section id="architecture" className="py-24 border-t border-slate-800/80 relative bg-slate-950/80 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 bg-emerald-950/60 border border-emerald-500/30 rounded-full px-4 py-1.5 mb-4 shadow-lg shadow-emerald-950/50"
+            >
+              <Cpu className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-xs font-bold text-emerald-300">Recommended Complete Architecture</span>
+            </motion.div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-display tracking-tight text-white mb-4">
+              Real-Time Distributed{' '}
+              <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+                System Architecture
+              </span>
+            </h2>
+            <p className="text-slate-400 text-sm max-w-2xl mx-auto leading-relaxed">
+              High-throughput bidirectional WebSockets, distributed Redis message streams, multi-tenant persistence, and an autonomous AI orchestrator dispatching to FCM and WhatsApp.
+            </p>
+          </div>
+
+          {/* Interactive Architecture Flow Diagram */}
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+              
+              {/* Left Column: Visual Pipeline */}
+              <div className="lg:col-span-7 space-y-3 font-mono text-xs">
+                {/* 1. React Web */}
+                <div className="p-3.5 rounded-2xl bg-cyan-950/30 border border-cyan-500/40 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-[11px]">
+                      WEB
+                    </div>
+                    <div>
+                      <div className="font-bold text-white text-xs">React Web Client (Socket.IO)</div>
+                      <div className="text-[10px] text-slate-400">Low-latency UI · POS Scanning · Real-time Carts</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] bg-cyan-900/60 text-cyan-300 px-2 py-0.5 rounded">Tier 1</span>
+                </div>
+
+                {/* Arrow */}
+                <div className="flex justify-center text-slate-500 text-[10px]">
+                  <span>↓ WebSocket Channel (Bidirectional) ↓</span>
+                </div>
+
+                {/* 2. Node.js Backend */}
+                <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-[11px]">
+                      API
+                    </div>
+                    <div>
+                      <div className="font-bold text-white text-xs">Node.js Express + Socket.IO Server</div>
+                      <div className="text-[10px] text-slate-400">JWT Gateway · RBAC Guard · In-Memory / Mongo Adapter</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded">Tier 2</span>
+                </div>
+
+                {/* Branch out to MongoDB + Redis */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div className="p-3 rounded-xl bg-slate-950 border border-emerald-500/30">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Database className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="font-bold text-white text-[11px]">MongoDB</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400">Multi-tenant document store</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-950 border border-rose-500/30">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Radio className="w-3.5 h-3.5 text-rose-400" />
+                      <span className="font-bold text-white text-[11px]">Redis Pub/Sub</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400">Streams & queue distribution</p>
+                  </div>
+                </div>
+
+                {/* Arrow */}
+                <div className="flex justify-center text-slate-500 text-[10px]">
+                  <span>↓ Redis Event Stream Ingestion ↓</span>
+                </div>
+
+                {/* 3. Event System */}
+                <div className="p-3.5 rounded-2xl bg-amber-950/30 border border-amber-500/40">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="font-bold text-white text-xs">Enterprise Event Bus</span>
+                    </div>
+                    <span className="text-[10px] bg-amber-900/60 text-amber-300 px-2 py-0.5 rounded">Tier 3</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {['ORDER', 'STOCK', 'PAYMENT', 'AI', 'ALERT', 'CHAT'].map((t) => (
+                      <span key={t} className="text-[9px] bg-slate-950 px-2 py-0.5 rounded text-amber-300 border border-amber-500/30">
+                        {t}_EVENT
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Arrow */}
+                <div className="flex justify-center text-slate-500 text-[10px]">
+                  <span>↓ Automated Inference Trigger ↓</span>
+                </div>
+
+                {/* 4. AI Orchestrator */}
+                <div className="p-3.5 rounded-2xl bg-purple-950/30 border border-purple-500/40 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-[11px]">
+                      AI
+                    </div>
+                    <div>
+                      <div className="font-bold text-white text-xs">AI Orchestrator (ML + LLM + RAG + Agents)</div>
+                      <div className="text-[10px] text-slate-400">Isolation Forest · XGBoost · Cosine Similarity · 6 Copilots</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] bg-purple-900/60 text-purple-300 px-2 py-0.5 rounded">Tier 4</span>
+                </div>
+
+                {/* 5. Notification Service */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div className="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 flex items-center gap-2.5">
+                    <Bell className="w-4 h-4 text-blue-400 shrink-0" />
+                    <div>
+                      <div className="text-[11px] font-bold text-white">FCM Push</div>
+                      <div className="text-[9px] text-slate-400">Mobile & Web Alerts</div>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2.5">
+                    <MessageSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div>
+                      <div className="text-[11px] font-bold text-white">WhatsApp</div>
+                      <div className="text-[9px] text-slate-400">Customer Receipts & Approvals</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Key Capabilities & Deep Dive */}
+              <div className="lg:col-span-5 bg-slate-950/80 p-6 rounded-2xl border border-slate-800 flex flex-col justify-between h-full">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-300 font-mono">
+                      Why This Architecture Matters
+                    </h3>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                    Unlike standard CRUD applications that poll APIs or suffer from bottlenecked relational locks, this architecture decouples heavy computing via <strong>Redis pub/sub streams</strong> and asynchronously triggers our <strong>AI Orchestrator</strong>.
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="text-xs font-bold text-white">Sub-40ms Event Latency</h4>
+                        <p className="text-[11px] text-slate-400">Immediate synchronization across distributed cash registers and branches.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="text-xs font-bold text-white">Autonomous Agent Loop</h4>
+                        <p className="text-[11px] text-slate-400">AI models compute reorders and fraud risk in background without blocking POS.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="text-xs font-bold text-white">Omnichannel Dispatch</h4>
+                        <p className="text-[11px] text-slate-400">FCM pushes urgent staff notifications; WhatsApp engages customers instantly.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row gap-2">
+                  <Link
+                    to="/architecture"
+                    className="w-full text-center py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20"
+                  >
+                    <Cpu className="w-3.5 h-3.5" />
+                    <span>Open Interactive Architecture Studio</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       </section>
