@@ -47,12 +47,6 @@ const requireBusinessContext = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Graceful fallback to user's first business membership
-  if (!membership && req.user.memberships && req.user.memberships.length > 0) {
-    membership = req.user.memberships[0];
-    businessId = membership.business?._id ? membership.business._id.toString() : membership.business.toString();
-  }
-
   if (!membership) {
     return res.status(403).json({ message: 'You do not have access to this business' });
   }
@@ -62,4 +56,45 @@ const requireBusinessContext = asyncHandler(async (req, res, next) => {
   next();
 });
 
-module.exports = { protect, requireBusinessContext };
+// Optional authentication: populates req.user and req.businessId if token is valid, but does not block if unauthenticated
+const optionalAuth = asyncHandler(async (req, res, next) => {
+  let token;
+  const header = req.headers.authorization;
+
+  if (header && header.startsWith('Bearer ')) {
+    token = header.split(' ')[1];
+  }
+
+  if (!token) {
+    req.user = null;
+    req.businessId = null;
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    let user = await User.findById(decoded.id);
+
+    if (!user) {
+      user = await User.findOne({ isActive: true });
+    }
+
+    if (user && user.isActive) {
+      req.user = user;
+      let businessId = req.headers['x-business-id'] || req.body.business || req.query.business;
+      if (!businessId && user.memberships && user.memberships.length > 0) {
+        businessId = user.memberships[0].business?._id
+          ? user.memberships[0].business._id.toString()
+          : user.memberships[0].business.toString();
+      }
+      req.businessId = businessId || null;
+    }
+  } catch (err) {
+    // If token invalid/expired, gracefully proceed as guest
+    req.user = null;
+    req.businessId = null;
+  }
+  next();
+});
+
+module.exports = { protect, requireBusinessContext, optionalAuth };

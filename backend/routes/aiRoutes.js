@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { protect, requireBusinessContext } = require('../middleware/auth');
+const { protect, requireBusinessContext, optionalAuth } = require('../middleware/auth');
 const { allowRoles } = require('../middleware/rbac');
+const {
+  copilotChat,
+  getCopilotQuickStats,
+} = require('../controllers/aiCopilotController');
 const {
   generateRecommendations,
   listRecommendations,
@@ -11,6 +15,11 @@ const {
   getForecastSummary,
   getProductRecommendations,
 } = require('../controllers/aiController');
+
+// AI Copilot / Chatboard Endpoints (Dual Mode: Guest & Authenticated with Real Data)
+router.post('/copilot/chat', optionalAuth, copilotChat);
+router.get('/copilot/stats', optionalAuth, getCopilotQuickStats);
+router.post('/chat', optionalAuth, copilotChat);
 
 router.use(protect, requireBusinessContext);
 

@@ -20,9 +20,11 @@ interface NavItem {
   label: string;
   path: string;
   icon: React.ElementType;
+  badge?: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
+  { label: 'AI Chatboard', path: '/chatboard', icon: Sparkles, badge: 'Copilot' },
   { label: '6 AI Assistants', path: '/assistants', icon: Bot },
   { label: 'ABOP Loop', path: '/abop-loop', icon: Layers },
   { label: '30/70 Differentiator', path: '/differentiator', icon: Scale },
@@ -76,6 +78,11 @@ export const LandingNavbar: React.FC = () => {
                 }`}
               >
                 <span>{item.label}</span>
+                {item.badge && (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold uppercase tracking-wider">
+                    {item.badge}
+                  </span>
+                )}
                 {active && (
                   <motion.span
                     layoutId="activeNavIndicator"
@@ -154,7 +161,12 @@ export const LandingNavbar: React.FC = () => {
                     }`}
                   >
                     <IconComponent className={`w-4 h-4 ${active ? 'text-emerald-400' : 'text-slate-500'}`} />
-                    <span>{item.label}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {item.badge && (
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold uppercase tracking-wider">
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 );
               })}

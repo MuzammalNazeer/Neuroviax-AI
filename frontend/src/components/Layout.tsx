@@ -62,6 +62,7 @@ const ALL_NAV_ITEMS = [
   { to: '/customer-segmentation', label: 'Customer Segments', icon: Users, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'K-Means' },
   { to: '/recommendations', label: 'AI Recommendations', icon: Sparkles, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'AI' },
   { to: '/ai-assistants', label: 'AI Assistants', icon: Bot, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'NEW' },
+  { to: '/chatboard', label: 'AI Chatboard', icon: Zap, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'COPILOT' },
 ];
 
 const ROLE_STYLES: Record<string, { label: string; badge: string; icon: React.ComponentType<any>; iconColor: string }> = {

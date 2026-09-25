@@ -17,7 +17,7 @@ const WhatsAppFloat: React.FC = () => {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 left-6 z-[9990] flex flex-col items-start gap-3">
       {/* Tooltip / Chat Bubble */}
       <AnimatePresence>
         {(isHovered || showTooltip) && (
@@ -44,7 +44,7 @@ const WhatsAppFloat: React.FC = () => {
               </div>
             </div>
             {/* Triangle pointer */}
-            <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white border-r border-b border-slate-200/80 rotate-45" />
+            <div className="absolute -bottom-1.5 left-6 w-3 h-3 bg-white border-r border-b border-slate-200/80 rotate-45" />
           </motion.div>
         )}
       </AnimatePresence>

@@ -40,6 +40,7 @@ import FAQPage from './pages/FAQPage';
 import SuperAdminRoute from './components/SuperAdminRoute';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminAuth from './pages/AdminAuth';
+import AIChatboardPage from './pages/AIChatboardPage';
 
 const App: React.FC = () => {
   // If running on dedicated admin port (5175), serve the AI Decision Cockpit & Admin Auth directly
@@ -82,6 +83,9 @@ const App: React.FC = () => {
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/chatboard" element={<AIChatboardPage />} />
+      <Route path="/copilot" element={<AIChatboardPage />} />
+      <Route path="/ai-chatboard" element={<AIChatboardPage />} />
       <Route path="/subscription/plans" element={<PricingPage />} />
       <Route path="/subscription/success" element={<CheckoutSuccess />} />
       <Route path="/subscription/cancel" element={<CheckoutCancel />} />
