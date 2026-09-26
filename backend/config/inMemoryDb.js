@@ -663,6 +663,55 @@ async function seedDemoData() {
     ],
   });
 
+  // Seed Coca Cola 1.5L with exact AI Recommendation (Current: 35, Forecast: 140, Order: 120, Conf: 91%, Risk: Medium)
+  const cokeProduct = await models.Product.create({
+    business: business._id,
+    name: 'Coca Cola 1.5L',
+    sku: 'COKE-1.5L',
+    unit: 'bottle',
+    costPrice: 120,
+    sellPrice: 160,
+    reorderThreshold: 50,
+  });
+
+  supplier.priceHistory.push({ product: cokeProduct._id, price: 115 });
+  await supplier.save();
+
+  await models.Inventory.create({
+    business: business._id,
+    product: cokeProduct._id,
+    branch: branch._id,
+    quantity: 35,
+    reorderThreshold: 50,
+    movementHistory: [
+      { type: 'in', quantity: 150, reason: 'Initial delivery', date: new Date(Date.now() - 14 * 86400000) },
+      { type: 'out', quantity: 115, reason: 'Retail sales', date: new Date(Date.now() - 2 * 86400000) },
+    ],
+  });
+
+  await models.AIRecommendation.create({
+    business: business._id,
+    assistant: 'procurement',
+    riskTier: 'medium',
+    action: 'reorder_suggestion',
+    payload: {
+      productId: cokeProduct._id,
+      productName: 'Coca Cola 1.5L',
+      currentStock: 35,
+      forecastDemand: 140,
+      suggestedQuantity: 120,
+      estimatedCost: 13800,
+      supplierId: supplier._id,
+      supplierPrice: 115,
+      model: 'XGBoost + Gemini Tripartite',
+    },
+    rationale: '[ML Demand Forecast: XGBoost] Projected demand is 140 units against 35 currently in stock. Reordering 120 units from Alpha Wholesale maintains safety buffer and prevents weekend stockouts.',
+    confidenceScore: 0.91,
+    relatedProduct: cokeProduct._id,
+    relatedSupplier: supplier._id,
+    status: 'pending',
+  });
+
   // Seed sample expenses (Section 6.6 & 10)
   await models.Expense.create({
     business: business._id,

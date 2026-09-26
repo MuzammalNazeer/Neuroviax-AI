@@ -23,6 +23,7 @@ import {
   Target,
   Clock,
 } from 'lucide-react';
+import AIRecommendationCard from '../components/AIRecommendationCard';
 
 interface CashFlow {
   receivable: number;
@@ -305,6 +306,45 @@ const Dashboard: React.FC = () => {
           );
         })}
       </div>
+
+      {/* ── Autonomous AI Restock Decision Hub (§7.2) ────────── */}
+      <motion.div variants={cardVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
+        <div className="lg:col-span-1">
+          <AIRecommendationCard />
+        </div>
+        <div className="lg:col-span-2 glass-card rounded-2xl p-6 shadow-elevated flex flex-col justify-between space-y-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full w-fit mb-3">
+              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              <span>Section 7.2 · Human-in-the-Loop Autonomous Decisioning</span>
+            </div>
+            <h3 className="text-xl font-black font-display text-slate-900 tracking-tight">
+              Autonomous Procurement &amp; Demand Forecasting Hub
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed mt-1.5">
+              Neuroviax AI continuously monitors multi-branch stock levels, correlates historical sales velocity with machine-learning demand projections, and prepares actionable replenishment proposals before inventory exhaustion disrupts cash flow.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100">
+            <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">Autonomy Rule</span>
+              <span className="text-xs font-bold text-slate-800">Review Gate (§7.2)</span>
+              <p className="text-[10px] text-slate-500 mt-0.5">High/Medium risk requires 1-click human authorization</p>
+            </div>
+            <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">Workflow Trigger</span>
+              <span className="text-xs font-bold text-emerald-700">Auto PO Generation</span>
+              <p className="text-[10px] text-slate-500 mt-0.5">Approved items dispatch directly to supplier ledger</p>
+            </div>
+            <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">Audit Tracking</span>
+              <span className="text-xs font-bold text-indigo-700">Immutable Ledger</span>
+              <p className="text-[10px] text-slate-500 mt-0.5">Model feedback and actor approvals saved for audit</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
       {/* ── ABOP Loop + AI Assistants ─────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">

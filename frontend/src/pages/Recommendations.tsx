@@ -28,6 +28,7 @@ import {
   ExternalLink,
   Package,
 } from 'lucide-react';
+import AIRecommendationCard from '../components/AIRecommendationCard';
 
 interface Recommendation {
   _id: string;
@@ -635,6 +636,11 @@ const Recommendations: React.FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Hero Feature: Signature Autonomous AI Recommendation Card (§7.2) */}
+          <div className="mb-6 max-w-2xl">
+            <AIRecommendationCard onActionComplete={() => loadProcurement()} />
+          </div>
 
           {/* Filter tabs */}
           <div className="flex items-center gap-1.5 border-b border-slate-200 pb-2">
