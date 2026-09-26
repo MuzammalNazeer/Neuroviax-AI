@@ -15,6 +15,7 @@ import {
   Info,
   Mail,
   Cpu,
+  Brain,
 } from 'lucide-react';
 
 interface NavItem {
@@ -26,6 +27,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'AI Chatboard', path: '/chatboard', icon: Sparkles, badge: 'Copilot' },
+  { label: 'Gemini Reasoning', path: '/gemini-reasoning', icon: Brain, badge: 'Tripartite' },
   { label: 'Architecture', path: '/architecture', icon: Cpu, badge: 'System' },
   { label: '6 AI Assistants', path: '/assistants', icon: Bot },
   { label: 'ABOP Loop', path: '/abop-loop', icon: Layers },

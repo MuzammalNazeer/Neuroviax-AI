@@ -43,6 +43,7 @@ import AdminAuth from './pages/AdminAuth';
 import AIChatboardPage from './pages/AIChatboardPage';
 import ArchitecturePage from './pages/ArchitecturePage';
 import SentimentIntentPage from './pages/SentimentIntentPage';
+import GeminiReasoningPage from './pages/GeminiReasoningPage';
 
 const App: React.FC = () => {
   // If running on dedicated admin port (5175), serve the AI Decision Cockpit & Admin Auth directly
@@ -94,6 +95,9 @@ const App: React.FC = () => {
       <Route path="/sentiment-analysis" element={<SentimentIntentPage />} />
       <Route path="/intent-classification" element={<SentimentIntentPage />} />
       <Route path="/sentiment-intent" element={<SentimentIntentPage />} />
+      <Route path="/gemini-reasoning" element={<GeminiReasoningPage />} />
+      <Route path="/ai-reasoning" element={<GeminiReasoningPage />} />
+      <Route path="/gemini-intelligence" element={<GeminiReasoningPage />} />
       <Route path="/subscription/plans" element={<PricingPage />} />
       <Route path="/subscription/success" element={<CheckoutSuccess />} />
       <Route path="/subscription/cancel" element={<CheckoutCancel />} />
@@ -134,6 +138,8 @@ const App: React.FC = () => {
         <Route path="/customer-segmentation" element={<CustomerSegmentation />} />
         <Route path="/customer-sentiment" element={<SentimentIntentPage />} />
         <Route path="/sentiment-intent" element={<SentimentIntentPage />} />
+        <Route path="/gemini-reasoning" element={<GeminiReasoningPage />} />
+        <Route path="/ai-reasoning" element={<GeminiReasoningPage />} />
         <Route path="/ai-assistants" element={<AIAssistants />} />
         <Route path="/team" element={<Team />} />
       </Route>

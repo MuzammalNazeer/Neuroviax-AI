@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/genai": "^2.24.0",
     "@types/canvas-confetti": "^1.9.0",
     "axios": "^1.7.2",
     "canvas-confetti": "^1.9.4",

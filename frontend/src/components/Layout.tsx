@@ -42,6 +42,7 @@ import {
   ShieldAlert,
   Cpu,
   MessageSquareQuote,
+  Brain,
 } from 'lucide-react';
 import api from '../api/axios';
 
@@ -63,6 +64,7 @@ const ALL_NAV_ITEMS = [
   { to: '/cash-flow-prediction', label: 'Cash-Flow AI', icon: LineChart, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'XGB' },
   { to: '/anomaly-detection', label: 'Anomaly Shield', icon: ShieldAlert, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant', 'staff'], badge: 'iForest' },
   { to: '/customer-sentiment', label: 'Sentiment & Intent', icon: MessageSquareQuote, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'BERT' },
+  { to: '/gemini-reasoning', label: 'Gemini Reasoning', icon: Brain, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'GEMINI' },
   { to: '/customer-segmentation', label: 'Customer Segments', icon: Users, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'K-Means' },
   { to: '/recommendations', label: 'AI Recommendations', icon: Sparkles, group: 'ai', roles: ['owner', 'admin', 'manager', 'accountant'], badge: 'AI' },
   { to: '/ai-assistants', label: 'AI Assistants', icon: Bot, group: 'ai', roles: ['owner', 'admin', 'manager', 'staff', 'accountant'], badge: 'NEW' },

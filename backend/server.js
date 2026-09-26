@@ -37,6 +37,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const anomalyRoutes = require('./routes/anomalyRoutes');
 const customerSegmentationRoutes = require('./routes/customerSegmentationRoutes');
 const sentimentIntentRoutes = require('./routes/sentimentIntentRoutes');
+const geminiRoutes = require('./routes/geminiRoutes');
 
 const app = express();
 
@@ -114,6 +115,8 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/ai/sentiment-intent', sentimentIntentRoutes);
 app.use('/api/sentiment-intent', sentimentIntentRoutes);
+app.use('/api/ai/gemini-reasoning', geminiRoutes);
+app.use('/api/gemini-reasoning', geminiRoutes);
 app.use('/api/ai/anomalies', anomalyRoutes);
 app.use('/api/anomalies', anomalyRoutes);
 app.use('/api/customer-segmentation', customerSegmentationRoutes);
