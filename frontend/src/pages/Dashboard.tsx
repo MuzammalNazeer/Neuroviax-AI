@@ -185,7 +185,7 @@ const Dashboard: React.FC = () => {
     {
       label: 'AI Procurement Signals',
       value: pendingRecCount !== null ? `${pendingRecCount} pending` : '—',
-      icon: Sparkles,
+      icon: Activity,
       trend: 'Human-in-the-loop active',
       trendUp: null,
       color: 'from-purple-500/15 to-pink-500/10',
@@ -195,7 +195,7 @@ const Dashboard: React.FC = () => {
     },
     {
       label: 'AI Adoption Rate',
-      value: pendingRecCount !== null ? (pendingRecCount === 0 ? '100%' : `${Math.round(Math.random() * 30 + 65)}%`) : '—',
+      value: pendingRecCount !== null ? (pendingRecCount === 0 ? '100%' : `${Math.max(65, Math.min(95, 100 - pendingRecCount * 5))}%`) : '—',
       icon: Target,
       trend: 'Recommendations accepted',
       trendUp: true,
@@ -212,7 +212,7 @@ const Dashboard: React.FC = () => {
       {/* ── Welcome Banner ───────────────────────────────── */}
       <motion.div
         variants={cardVariants}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#052e16] via-[#064e3b] to-[#0f4c75] text-white p-8 shadow-xl"
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#052e16] via-[#064e3b] to-[#0f4c75] text-white p-5 sm:p-7 md:p-8 shadow-xl"
       >
         {/* Decorative glows */}
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-8 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
@@ -224,7 +224,7 @@ const Dashboard: React.FC = () => {
               <Zap className="w-3.5 h-3.5 text-amber-300" />
               <span>AI-First Autonomous Business Operating Platform</span>
             </div>
-            <h2 className="text-3xl font-black font-display tracking-tight text-white mb-2">
+            <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-white mb-2">
               Neuroviax Operational Hub
             </h2>
             <p className="text-emerald-100/75 text-sm leading-relaxed mb-1">
@@ -265,7 +265,6 @@ const Dashboard: React.FC = () => {
                 whileTap={{ scale: 0.96 }}
                 className="w-full bg-emerald-700/60 hover:bg-emerald-700 text-white border border-emerald-500/40 font-semibold px-5 py-2.5 rounded-xl text-xs backdrop-blur-sm transition flex items-center gap-2"
               >
-                <Sparkles className="w-4 h-4 text-emerald-300" />
                 <span>Review AI Proposals</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-auto" />
               </motion.button>
@@ -316,7 +315,7 @@ const Dashboard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full w-fit mb-3">
               <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-              <span>Section 7.2 · Human-in-the-Loop Autonomous Decisioning</span>
+              <span>Human-in-the-Loop Autonomous Decisioning</span>
             </div>
             <h3 className="text-xl font-black font-display text-slate-900 tracking-tight">
               Autonomous Procurement &amp; Demand Forecasting Hub
@@ -380,10 +379,9 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
             <div>
               <h3 className="font-black font-display text-slate-900 text-sm flex items-center gap-2">
-                <Bot className="w-4 h-4 text-purple-600" />
                 6 Domain-Scoped AI Assistants
               </h3>
-              <p className="text-[10px] text-slate-400 mt-0.5">Each operates over a constrained data domain · Section 7</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Each operates over a constrained data domain</p>
             </div>
             <Link to="/ai-assistants" className="text-[11px] text-purple-600 font-bold hover:underline flex items-center gap-1">
               View all <ChevronRight className="w-3 h-3" />
@@ -422,7 +420,7 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 className="font-black font-display text-slate-900 text-sm">Product Roadmap</h3>
-              <p className="text-[10px] text-slate-400 mt-0.5">4-phase delivery plan · Section 15</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">4-phase delivery roadmap</p>
             </div>
             <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
               <Activity className="w-3 h-3" />

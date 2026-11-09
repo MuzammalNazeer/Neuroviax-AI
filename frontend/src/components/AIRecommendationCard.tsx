@@ -226,12 +226,10 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({
       {/* Header bar: 🤖 AI Recommendation */}
       <div className="relative z-10 flex items-center justify-between gap-3 pb-3 border-b border-slate-800">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-300 shadow-md">
-            <Bot className="w-4 h-4 text-purple-300" />
-          </div>
+
           <div>
             <h3 className="text-sm md:text-base font-extrabold tracking-tight text-white flex items-center gap-1.5">
-              <span>🤖 AI Recommendation</span>
+              <span>AI Recommendation</span>
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
             </h3>
             <p className="text-[11px] text-slate-400 font-mono">
@@ -442,7 +440,7 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({
                 : 'bg-slate-950 text-slate-300 border-slate-700'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
+            
             <span className="flex-1">{toastMessage.text}</span>
             <button
               onClick={() => setToastMessage(null)}

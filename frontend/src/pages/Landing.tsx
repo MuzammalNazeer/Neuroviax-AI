@@ -271,8 +271,8 @@ const Landing: React.FC = () => {
       <LandingNavbar />
 
       {/* ── HERO ──────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex items-center pt-16">
-        <div className="max-w-7xl mx-auto px-6 py-24 w-full">
+      <section className="relative min-h-screen flex items-center pt-14 sm:pt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-24 w-full">
           <div className="max-w-4xl mx-auto text-center">
 
             {/* Badge */}
@@ -293,7 +293,7 @@ const Landing: React.FC = () => {
               variants={fadeUp}
               initial="hidden"
               animate="visible"
-              className="text-5xl sm:text-6xl lg:text-7xl font-black font-display tracking-tight leading-[1.05] mb-6"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-display tracking-tight leading-[1.05] mb-4 sm:mb-6"
             >
               Your Business,{' '}
               <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
@@ -308,7 +308,7 @@ const Landing: React.FC = () => {
               variants={fadeUp}
               initial="hidden"
               animate="visible"
-              className="text-slate-400 text-lg leading-relaxed max-w-2xl mx-auto mb-4"
+              className="text-slate-400 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-4"
             >
               Neuroviax ABOP closes the loop:{' '}
               <span className="text-emerald-300 font-semibold">

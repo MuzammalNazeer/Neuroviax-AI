@@ -259,11 +259,11 @@ const Orders: React.FC = () => {
             <Info className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-bold text-slate-900">Orders Kahan Se Aate Hain?</span>
+            <span className="font-bold text-slate-900">How Orders Work</span>
             <p className="text-slate-500 text-[11px] mt-0.5">
-              1. <strong>Manual Counter:</strong> Click "+ Create Order" above. &bull; 
-              2. <strong>AI Proposals:</strong> Approve reorder proposals in Recommendations. &bull; 
-              3. <strong>Fulfill:</strong> "Mark Fulfilled" dabane se inventory se stock khud minus/plus ho jata hai.
+              1. <strong>Manual Entry:</strong> Click "+ Create Order" above. &bull; 
+              2. <strong>AI Proposals:</strong> Approve reorder proposals from AI Recommendations. &bull; 
+              3. <strong>Fulfill:</strong> Click "Mark Fulfilled" to automatically update inventory stock levels.
             </p>
           </div>
         </div>
@@ -318,16 +318,16 @@ const Orders: React.FC = () => {
                       <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mx-auto text-xl shadow-xs">
                         🧾
                       </div>
-                      <p className="font-bold text-slate-700 text-sm">Abhi tak koi order nahi hai</p>
+                      <p className="font-bold text-slate-700 text-sm">No orders yet</p>
                       <p className="text-[11px] text-slate-400 leading-relaxed">
-                        Naya order banane ke liye upar <strong>"+ Create Order"</strong> button dabayein, ya AI Recommendations se auto-proposal approve karein.
+                        Click <strong>"+ Create Order"</strong> above to create your first order, or approve an AI proposal from Recommendations.
                       </p>
                       <button
                         onClick={() => setIsCreateOpen(true)}
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition cursor-pointer"
                       >
                         <Plus className="w-4 h-4" />
-                        <span>Pehla Order Banayein</span>
+                        <span>Create First Order</span>
                       </button>
                     </div>
                   </td>
@@ -497,7 +497,7 @@ const Orders: React.FC = () => {
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">Select Product</label>
                   {products.length === 0 ? (
                     <div className="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-                      Koi product nahi mila! Pehle "Products" page par ja kar product add karein.
+                      No products found! Please go to the "Products" page and add products first.
                     </div>
                   ) : (
                     <select

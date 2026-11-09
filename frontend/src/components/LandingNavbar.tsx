@@ -50,8 +50,8 @@ export const LandingNavbar: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-xl transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <header className="fixed top-0 inset-x-0 z-50 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-xl transition-all">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
         {/* Logo / Brand */}
         <Link to="/" className="flex items-center gap-3 group focus:outline-none">
           <div className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform shrink-0 p-0.5 border border-slate-700/60">
@@ -68,7 +68,7 @@ export const LandingNavbar: React.FC = () => {
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1.5 text-xs font-medium">
+        <nav className="hidden xl:flex items-center gap-1 text-xs font-medium flex-wrap">
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.path);
             return (
@@ -100,7 +100,7 @@ export const LandingNavbar: React.FC = () => {
         </nav>
 
         {/* Action CTAs / User Auth */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="flex items-center gap-2">
 
 
           {user ? (
@@ -133,23 +133,23 @@ export const LandingNavbar: React.FC = () => {
         {/* Mobile Menu Toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 border border-slate-800 transition"
+          className="xl:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 border border-slate-800 transition shrink-0"
           aria-label="Toggle navigation menu"
         >
           {mobileMenuOpen ? <X className="w-5 h-5 text-emerald-400" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile / Tablet Drawer Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t border-slate-800/80 bg-slate-950/95 backdrop-blur-2xl px-4 py-5 space-y-2"
+            className="xl:hidden border-t border-slate-800/80 bg-slate-950/95 backdrop-blur-2xl px-3 sm:px-4 py-4 space-y-2 max-h-[80vh] overflow-y-auto"
           >
-            <div className="grid grid-cols-1 gap-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
               {NAV_ITEMS.map((item) => {
                 const active = isActive(item.path);
                 const IconComponent = item.icon;
